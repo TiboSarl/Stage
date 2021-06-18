@@ -1,0 +1,10 @@
+body {
+    background-color: rgb(255,255,255);
+}
+
+.canvas {
+    position: absolute;
+    overflow: visible;
+    top: 0px;
+    left: 0px;
+}
