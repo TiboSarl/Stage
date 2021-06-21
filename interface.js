@@ -2075,10 +2075,6 @@ function randomize_elevation(iteration = 0, value = 0.4, offset = 0) {
     geometryg.faces.push(meshGrass.geometry.faces[i]);
   }
 
-  for (let i = 0; i < meshGrass.geometry.faceVertexUvs.length; i++) {
-    geometryg.faceVertexUvs.push(meshGrass.geometry.faceVertexUvs[i]);
-  }
-
   var selectedObject = scene.getObjectByName("herbe");
   scene.remove(selectedObject);
 
