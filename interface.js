@@ -900,13 +900,64 @@ var centresTexture12 = [
   [510, 22],
 ];
 
+var centresTexturePave = [
+  [6, 7],
+  [10, 63],
+  [16, 230],
+  [17, 144],
+  [23, 318],
+  [27, 407],
+  [37, 496],
+  [66, 19],
+  [80, 92],
+  [86, 174],
+  [88, 256],
+  [107, 347],
+  [117, 437],
+  [127, 507],
+  [127, 510],
+  [149, 40],
+  [161, 118],
+  [168, 199],
+  [181, 286],
+  [190, 374],
+  [211, 471],
+  [216, 5],
+  [231, 63],
+  [241, 147],
+  [255, 227],
+  [269, 315],
+  [283, 402],
+  [297, 16],
+  [302, 493],
+  [308, 93],
+  [323, 171],
+  [342, 257],
+  [353, 344],
+  [369, 436],
+  [381, 39],
+  [390, 511],
+  [393, 117],
+  [410, 198],
+  [427, 285],
+  [445, 6],
+  [445, 371],
+  [465, 464],
+  [478, 139],
+  [490, 227],
+  [499, 313],
+  [504, 21],
+  [505, 400],
+  [507, 95],
+];
+
 init_textures();
 init();
 animate();
 
 // Fonction pour définir un maillage de plan
 function definePlane(mater, x, y, z, w, h, faces = 1) {
-  meshPlane = new THREE.Mesh(
+  geometryplane = meshPlane = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h, faces, faces),
     mater
   );
@@ -1626,8 +1677,8 @@ function dupliquer(centres, Xrepeat, Yrepeat, w, h) {
   T = [];
 
   for (let k = 0; k < centres.length; k++) {
-    var x = centresTexture5[k][0];
-    var y = centresTexture5[k][1];
+    var x = centresTexturePave[k][0];
+    var y = centresTexturePave[k][1];
 
     for (let i = 0; i < Xrepeat; i++) {
       for (let j = 0; j < Yrepeat; j++) {
@@ -1713,7 +1764,7 @@ function init_textures() {
   ];
   var chemin = computeCheminInterpol(Points);
 
-  var centres = dupliquer(centresTexture5, 10, 10, w1, h1);
+  var centres = dupliquer(centresTexturePave, 10, 10, w1, h1);
   console.log("modifierMasque2");
   canvas2 = modifierMasque2(canvas2, chemin, canvas, centres);
 
@@ -1979,7 +2030,7 @@ function animate() {
 
     var chemin = computeCheminInterpol(Points);
 
-    var centres = dupliquer(centresTexture5, 10, 10, w1, h1);
+    var centres = dupliquer(centresTexturePave, 10, 10, w1, h1);
     console.log("modifierMasque2");
     canvas2 = modifierMasque2(canvas2, chemin, canvas, centres);
     //canvas2 = afficherFleur(canvas2);
@@ -2030,7 +2081,7 @@ function animate() {
 }
 
 // Assigner des élévations aléatoires aux vertices des maillages plans
-function randomize_elevation(iteration = 0, value = 0.4, offset = 0) {
+function randomize_elevation(value = 0.4, offset = 0) {
   for (let i = 0; i < meshFloor.geometry.vertices.length; i++) {
     let random_value = Math.random();
     meshFloor.geometry.vertices[i].z = random_value * value + offset + epsilon;
@@ -2041,6 +2092,24 @@ function randomize_elevation(iteration = 0, value = 0.4, offset = 0) {
   meshGrass.geometry.verticesNeedUpdate = true;
   meshFloor.geometry.facesNeedUpdate = true;
   meshGrass.geometry.facesNeedUpdate = true;
+  meshGrass.geometry.elementsNeedUpdate = true;
+  meshFloor.geometry.elementsNeedUpdate = true;
+}
+
+function applyLoop(iteration) {
+  meshFloor.geometry.uvsNeedUpdate = true;
+  meshGrass.geometry.uvsNeedUpdate = true;
+
+  meshFloor.geometry.morphTargetsNeedUpdate = true;
+
+  meshFloor.geometry.normalsNeedUpdate = true;
+  meshFloor.geometry.colorsNeedUpdate = true;
+  meshFloor.geometry.tangentsNeedUpdate = true;
+  meshGrass.geometry.morphTargetsNeedUpdate = true;
+
+  meshGrass.geometry.normalsNeedUpdate = true;
+  meshGrass.geometry.colorsNeedUpdate = true;
+  meshGrass.geometry.tangentsNeedUpdate = true;
   for (let j = 0; j < iteration; j++) {
     let result = loop(meshFloor.geometry.vertices, meshFloor.geometry.faces);
     meshFloor.geometry.vertices = result[0];
@@ -2061,10 +2130,6 @@ function randomize_elevation(iteration = 0, value = 0.4, offset = 0) {
     geometryf.faces.push(meshFloor.geometry.faces[i]);
   }
 
-  for (let i = 0; i < meshFloor.geometry.faceVertexUvs.length; i++) {
-    geometryf.faceVertexUvs.push(meshFloor.geometry.faceVertexUvs[i]);
-  }
-
   var geometryg = new THREE.Geometry();
 
   for (let i = 0; i < meshGrass.geometry.vertices.length; i++) {
@@ -2075,6 +2140,13 @@ function randomize_elevation(iteration = 0, value = 0.4, offset = 0) {
     geometryg.faces.push(meshGrass.geometry.faces[i]);
   }
 
+  geometryf.computeFaceNormals();
+  geometryg.computeFaceNormals();
+
+  //ThreeUvMapper.assignUVs(geometryf);
+  //ThreeUvMapper.assignUVs(geometryg);
+
+  console.log("new");
   var selectedObject = scene.getObjectByName("herbe");
   scene.remove(selectedObject);
 
@@ -2086,7 +2158,7 @@ function randomize_elevation(iteration = 0, value = 0.4, offset = 0) {
   scene.add(meshFloor1);
 
   var meshGrass1 = new THREE.Mesh(geometryg, materialGrass);
-  meshGrass1.name = "grass";
+  meshGrass1.name = "grass1";
   scene.add(meshGrass1);
 }
 
@@ -2197,8 +2269,8 @@ function loop(origVert, origMesh) {
     if (occurences[i] != 0) {
       destVert[i] = new THREE.Vector3(
         tmp[i][0] / occurences[i],
-        tmp[i][1] / occurences[i],
-        tmp[i][2] / occurences[i]
+        tmp[i][2] / occurences[i],
+        tmp[i][1] / occurences[i]
       );
     }
   }
@@ -2263,7 +2335,7 @@ function getNewVertex(e, vertlist, mesh, newVertlist) {
       nvert[1] = (1 / 2) * (v1.y + v2.y);
       nvert[2] = (1 / 2) * (v1.z + v2.z);
     }
-    vertlist.push(new THREE.Vector3(nvert[0], nvert[1], nvert[2]));
+    vertlist.push(new THREE.Vector3(nvert[0], nvert[2], nvert[1]));
     return [newindex, vertlist, newVertlist];
   } else {
     i = getIndex(newVertlist, e);
