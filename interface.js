@@ -16,11 +16,29 @@ const numeroTexture = 11;
 
 
 const scene = new THREE.Scene();
+
+
+var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+cube.name = "cube";
+var Points = [
+  [0, 0],
+  [500, 1000],
+  [2000, 3000],
+  [4000, 2000],
+  [5000, 3000],
+];
+
+var cubes = [];
+var compteur = 0;
+
+
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-const fov = 75;
+/*const fov = 75;
 const aspect = 2;  // the canvas default
 const near = 0.1;
-const far = 5;
+const far = 5;*/
 //const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 camera.position.z = 0.5;
 
@@ -67,7 +85,7 @@ for (let i = 1; i <= centresTexture11bis.length; i++) {
 Promise.all(promis).then((imgs) => {
   init_textures(imgs).then((textures) => {
     init(textures);
-    animate();
+    animate(textures);
   });
 });
 
@@ -182,6 +200,7 @@ function createTextureCheminBasique(chemintext, masquetext, chemin, centres, rep
 
   const distancemax = 350;
 
+  console.log(masquetext);
   var w = masquetext.width;
   var h = masquetext.height;
 
@@ -611,6 +630,21 @@ function dupliquer(centres, Xrepeat, Yrepeat, w, h) {
   return T;
 }
 
+function transformCanvastoThreeCoordonates(x, z) {
+  var newx = z / 512 - 5;
+  var newy = - x / 512 + 5;
+  var newz = 0.1;
+  var coordonnees = [newx, newy, newz];
+  return coordonnees;
+}
+
+function transformThreeCoordonatestoCanvas(x, y) {
+  var newx = - (y - 5) * 512;
+  var newy = (x + 5) * 512;
+  var coordonnees = [newx, newy];
+  return coordonnees;
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -642,16 +676,8 @@ function init_textures(imgs) {
   /////////// CHEMIN /////////
   const wireframe_mode = false
 
-  var Points = [
-    [0, 0],
-    [500, 1000],
-    [2000, 3000],
-    [4000, 2000],
-    [5000, 3000],
-  ];
-
   var chemin = computeCheminInterpol(Points);
-  var centres = dupliquer(centresTexture11bis, 10, 10, 512, 512);
+  var centres = dupliquer(centresTexture11, 10, 10, 512, 512);
   
   var tabresult = createTextureCheminBasique(imgs[4],imgs[5], chemin, centres, 10, 10);
   var canvascheminMasque = tabresult[0];
@@ -667,7 +693,7 @@ function init_textures(imgs) {
   const materialChemin = new THREE.MeshBasicMaterial({alphaMap : textureCheminMasque, alphaTest : 0.5, map: textureChemin,wireframe: wireframe_mode,  side: THREE.DoubleSide});
 
 
-  return Promise.resolve([materialFond, materialChemin])
+  return Promise.resolve([materialFond, materialChemin, imgs[4], imgs[5]])
   
 }
 
@@ -677,12 +703,7 @@ function init(textures) {
 
   document.addEventListener("contextmenu",function (event) {event.preventDefault();},false);
 
-  var space = false;
-
   // Déplacement dans la scène avec Z Q S D
-  var mouvement = { "haut": false, "bas": false, "droite": false, "gauche": false }
-  var mouvementcube = { "haut": false, "bas": false, "droite": false, "gauche": false }
-
   document.addEventListener("keydown", function (event) {
     if (event.keyCode == 68) {
       state.mouvement.haut = true;
@@ -704,7 +725,7 @@ function init(textures) {
       state.space = true;
     } else if (event.keyCode == 16) {
       state.selectionPoints = true;
-    } else if ((event.keyCode = 13)) {
+    } else if (event.keyCode == 13) {
       state.rendre = true;
     }
   });
@@ -742,16 +763,36 @@ function init(textures) {
   //camera.position.set(0, 4, 0);
 
   controls.update();
-  //const geometry = new THREE.PlaneGeometry( 1, 1);
-  //const plane = new THREE.Mesh( geometry, textures[0]);
 
+  // Creation de deux plans
   const epsilon = 0.001;
 
   const plane = definePlane(textures[0], 0, 0, 0, mapW, mapH, 10, 10);
+  plane.name = "pelouse";
   scene.add(plane);
 
   const planeChemin = definePlane(textures[1], 0, epsilon, 0, mapW, mapH, 10, 10);
+  planeChemin.name = "floor";
   scene.add(planeChemin);
+
+  // Ajout de la ligne du chemin
+  var chemin = computeCheminInterpol(Points);
+  var pointsClick = [];
+  for (let i = 0; i < chemin.length; i++) {
+    var x = chemin[i][0];
+    var z = chemin[i][1];
+    var newcoordinates = transformCanvastoThreeCoordonates(x, z);
+    pointsClick.push(
+      new THREE.Vector3(newcoordinates[0], newcoordinates[1], newcoordinates[2])
+    );
+  }
+
+  var geometryClick = new THREE.Geometry().setFromPoints(pointsClick);
+  var materialClick = new THREE.LineBasicMaterial({ color: 0x0000ff });
+
+  var lineClick = new THREE.Line(geometryClick, materialClick);
+  lineClick.name = "line";
+  scene.add(lineClick);
 
 }
 
@@ -769,6 +810,72 @@ function animate() {
     scene.position.z += 0.1;
   } else if (state.mouvement.gauche) {
     scene.position.z -= 0.1;
+  } else if (state.mouvementcube.haut) {
+    cube.position.x -= 0.03;
+  } else if (state.mouvementcube.bas) {
+    cube.position.x += 0.03;
+  } else if (state.mouvementcube.droite) {
+    cube.position.y -= 0.03;
+  } else if (state.mouvementcube.gauche) {
+    cube.position.y += 0.03;
+  } else if (state.space) {
+
+    var xenter = cube.position.x;
+    var yenter = cube.position.y;
+    var coordonnespoint = transformThreeCoordonatestoCanvas(xenter, yenter);
+    Points.push(coordonnespoint);
+    console.log(Points)
+
+    var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    var cubeAffichage = new THREE.Mesh(geometry, material);
+    cubes.push(cubeAffichage);
+    console.log(cubes);
+    cubes[compteur].name = "cube" + compteur;
+    cubes[compteur].position.x = xenter;
+    cubes[compteur].position.y = yenter;
+    scene.add(cubes[compteur]);
+    compteur = compteur + 1;
+
+    state.space = false;
+
+  } else if (state.selectionPoints) {
+
+    for (let i = 0; i < compteur; i++) {
+      var selectedObject = scene.getObjectByName("cube" + i);
+      scene.remove(selectedObject);
+    }
+
+    var selectedObject = scene.getObjectByName("line");
+    scene.remove(selectedObject);
+
+    var selectedObject = scene.getObjectByName("floor");
+    scene.remove(selectedObject);
+
+    if (!state.dejacube) {
+      scene.add(cube);
+    }
+
+    console.log("construction de chemin");
+    state.dejacube = true;
+    state.selectionPoints = false;
+    Points = [];
+    cubes = [];
+    compteur = 0;
+  
+  } else if (state.rendre) {
+
+  var selectedObject = scene.getObjectByName("pelouse");
+    scene.remove(selectedObject);
+
+  Promise.all(promis).then((imgs) => {
+    init_textures(imgs).then((textures) => {
+      init(textures);
+    });
+  });
+
+    state.rendre = false;
+
   }
 }
 
