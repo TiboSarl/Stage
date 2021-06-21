@@ -951,6 +951,112 @@ var centresTexturePave = [
   [507, 95],
 ];
 
+var centresTexturePaveJoint = [
+  [21, 148],
+  [24, 191],
+  [24, 433],
+  [25, 57],
+  [25, 231],
+  [25, 287],
+  [25, 335],
+  [25, 377],
+  [25, 506],
+  [26, 471],
+  [28, 102],
+  [29, 16],
+  [84, 5],
+  [86, 221],
+  [87, 273],
+  [87, 403],
+  [87, 495],
+  [88, 354],
+  [89, 118],
+  [89, 170],
+  [90, 40],
+  [90, 451],
+  [91, 82],
+  [92, 311],
+  [156, 23],
+  [158, 70],
+  [158, 117],
+  [158, 210],
+  [160, 157],
+  [160, 395],
+  [160, 443],
+  [161, 348],
+  [161, 487],
+  [162, 260],
+  [165, 300],
+  [222, 189],
+  [222, 320],
+  [223, 6],
+  [225, 135],
+  [225, 242],
+  [225, 467],
+  [225, 501],
+  [226, 89],
+  [227, 44],
+  [227, 282],
+  [227, 374],
+  [228, 415],
+  [264, 463],
+  [266, 7],
+  [266, 230],
+  [266, 422],
+  [267, 137],
+  [267, 188],
+  [267, 270],
+  [268, 44],
+  [268, 324],
+  [268, 371],
+  [268, 501],
+  [270, 88],
+  [314, 243],
+  [315, 197],
+  [316, 13],
+  [316, 509],
+  [317, 284],
+  [318, 152],
+  [318, 330],
+  [318, 380],
+  [318, 429],
+  [318, 474],
+  [319, 58],
+  [320, 102],
+  [387, 85],
+  [387, 186],
+  [389, 249],
+  [389, 306],
+  [390, 30],
+  [390, 354],
+  [390, 400],
+  [390, 446],
+  [390, 492],
+  [392, 141],
+  [452, 7],
+  [454, 94],
+  [456, 367],
+  [457, 415],
+  [458, 202],
+  [459, 159],
+  [459, 463],
+  [460, 42],
+  [460, 259],
+  [460, 321],
+  [461, 500],
+  [501, 230],
+  [502, 16],
+  [503, 105],
+  [503, 191],
+  [503, 423],
+  [503, 472],
+  [504, 286],
+  [504, 331],
+  [505, 377],
+  [506, 58],
+  [506, 145],
+];
+
 init_textures();
 init();
 animate();
@@ -1677,8 +1783,8 @@ function dupliquer(centres, Xrepeat, Yrepeat, w, h) {
   T = [];
 
   for (let k = 0; k < centres.length; k++) {
-    var x = centresTexturePave[k][0];
-    var y = centresTexturePave[k][1];
+    var x = centresTexturePaveJoint[k][0];
+    var y = centresTexturePaveJoint[k][1];
 
     for (let i = 0; i < Xrepeat; i++) {
       for (let j = 0; j < Yrepeat; j++) {
@@ -1764,7 +1870,7 @@ function init_textures() {
   ];
   var chemin = computeCheminInterpol(Points);
 
-  var centres = dupliquer(centresTexturePave, 10, 10, w1, h1);
+  var centres = dupliquer(centresTexturePaveJoint, 10, 10, w1, h1);
   console.log("modifierMasque2");
   canvas2 = modifierMasque2(canvas2, chemin, canvas, centres);
 
@@ -2030,7 +2136,7 @@ function animate() {
 
     var chemin = computeCheminInterpol(Points);
 
-    var centres = dupliquer(centresTexturePave, 10, 10, w1, h1);
+    var centres = dupliquer(centresTexturePaveJoint, 10, 10, w1, h1);
     console.log("modifierMasque2");
     canvas2 = modifierMasque2(canvas2, chemin, canvas, centres);
     //canvas2 = afficherFleur(canvas2);
