@@ -903,7 +903,7 @@ function randomize_elevation(value = 0.4, offset = 0, epsilon) {
 
 }
 
-
+/*
 // Récupérer l'élévation correspondant à une position au sol donnée
 function zPos(x, y) {
 
@@ -927,4 +927,4 @@ function zPos(x, y) {
   }
 
 }
-
+*/
