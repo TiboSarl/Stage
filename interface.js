@@ -25,7 +25,7 @@ tableauCentres[12] = centresTexture12;
 
 
 const textureHerbeBasique = false;
-const numeroTexture = 6;
+const numeroTexture = 11;
 const randomizeElevation = true;
 
 //// PB : DEFINE TEXTURE ET CAMERA
@@ -129,7 +129,22 @@ function createTextureHerbe(fleurs, herbetext, repeatX, repeatY) {
         var wr = Math.floor(Math.random() * 2);
         var hr = Math.floor(Math.random() * 4);
 
-        ctx.drawImage(herbetext, w*wr,h*hr, w, h, w * i, j * h, w, h);
+        var decalage = Math.random();
+        var decalage2 = Math.random();
+
+        //ctx.drawImage(herbetext, w*wr,h*hr, w, h, w * i, j * h, w, h);
+
+        ctx.drawImage(herbetext,w * wr, h * hr, w * decalage, h * decalage2, w * i + w * (1 - decalage),
+          j * h + h * (1 - decalage2), w * decalage, h * decalage2);
+
+        ctx.drawImage(herbetext, w * wr + w * decalage, h * hr, w - w * decalage, h * decalage2, w * i,
+          j * h + h * (1 - decalage2),w - w * decalage,h * decalage2);
+
+        ctx.drawImage(herbetext,w * wr, h * hr + h * decalage2,w * decalage,h * (1 - decalage2),
+          w * i + w * (1 - decalage),j * h,w * decalage,h * (1 - decalage2));
+
+        ctx.drawImage(herbetext,w * wr + w * decalage,h * hr + h * decalage2,w - w * decalage,
+          h - h * decalage2, w * i,j * h,w - w * decalage,h - h * decalage2);
 
     }
 }
@@ -161,32 +176,7 @@ for (let i = 0; i < nbSorteFleurs; i++) {
 
   return canvasherbe
 }
-/*
-function createCanvasforTextureRepeat(img, repeatX, repeatY) {
 
-  var w = img.width;
-  var h = img.height;
-
-  // Create a Canvas element
-  var canvas = document.createElement('canvas');
-
-  // Size the canvas to the element
-  canvas.width = w * repeatX;
-  canvas.height = h * repeatY;
-
-
-  // Draw image onto the canvas
-  var ctx = canvas.getContext('2d');
-
-  for (let i = 0; i < repeatX; i++) {
-
-      for (let j = 0; j < repeatY; j++) {
-          ctx.drawImage(img, w * i, h * j);
-      }
-  }
-
-  return canvas
-}*/
 
 function distancechemin(point, chemin) {
   var min = 100000000000000;
