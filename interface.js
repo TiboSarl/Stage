@@ -204,9 +204,50 @@ function distancechemin(point, chemin) {
   return min;
 }
 
+function estPresent(pc, pierres) {
+  var i = 0;
+  while (i < pierres.length) {
+    var pierre = pierres[i];
+    if (pc[0] == pierre[0] && pc[1] == pierre[1]) {
+      return true;
+    }
+    i = i + 1;
+  }
+  return false;
+}
+
+function trouverPierrePlusProche(point, pierres, centres) {
+  var min = 100000000000000;
+  var pointleplusproche = [0, 0];
+  for (let i = 0; i < centres.length; i++) {
+    var pc = centres[i];
+    var distance = Math.sqrt(
+      Math.pow(pc[0] - point[0], 2) + Math.pow(pc[1] - point[1], 2)
+    );
+    if (distance < min && !estPresent(pc, pierres)) {
+      min = distance;
+      pointleplusproche = pc;
+    }
+  }
+
+  return pointleplusproche;
+}
+
+function tasdepierre(point, nbPierres, centres) {
+  var pierres = [];
+  pierres.push(point);
+  for (let i = 0; i < nbPierres; i++) {
+    var pierre = trouverPierrePlusProche(point, pierres, centres);
+    pierres.push(pierre);
+  }
+  return pierres;
+}
+
 function createTextureCheminBasique(chemintext, masquetext, chemin, centres, repeatX, repeatY) {
 
-  const distancemax = 350;
+  const distancemaxPierre = 1000;
+  const distancemax = 450;
+  const distancemaxherbe = 350;
 
   var w = masquetext.width;
   var h = masquetext.height;
@@ -247,8 +288,27 @@ function createTextureCheminBasique(chemintext, masquetext, chemin, centres, rep
   var point;
   for (let i = 0; i < centres.length; i++) {
       point = centres[i];
-      if (distancechemin(point, chemin) < distancemax) {
-          germes.push(point);
+      var r1 = Math.random();
+      var r2 = Math.random();
+      if (distancechemin(point, chemin) < distancemaxherbe) {
+        germes.push(point);
+      } else if (
+        distancechemin(point, chemin) > distancemaxherbe &&
+        distancechemin(point, chemin) < distancemax
+      ) {
+        if (r1 < 0.3) [germes.push(point)];
+      } else if (
+        distancechemin(point, chemin) > distancemax &&
+        distancechemin(point, chemin) < distancemaxPierre
+      ) {
+        if (r2 < 0.01) {
+          var nbPierres = Math.random() * 10;
+          var Pierres = tasdepierre(point, nbPierres, centres);
+  
+          for (let l = 0; l < Pierres.length; l++) {
+            germes.push(Pierres[l]);
+          }
+        }
       }
   }
   
