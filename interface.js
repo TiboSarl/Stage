@@ -1,21 +1,40 @@
 const centresTexture11bis = await (await fetch("./centresTexture11bis.json")).json();
 
+var tableauCentres = [0,0,0,0,0,0,0,0,0,0,0,0];
 
 
-const centresTexture11 = await (await fetch("./centresTexture11.json")).json();
 const centresTexture3 = await (await fetch("./centresTexture3.json")).json();
-const centresTexture10 = await (await fetch("./centresTexture10.json")).json();
-const centresTexture8 = await (await fetch("./centresTexture8.json")).json();
+tableauCentres[3] = centresTexture3;
+const centresTexture5 = await (await fetch("./centresTexture5.json")).json();
+tableauCentres[5] = centresTexture5;
+const centresTexture6 = await (await fetch("./centresTexture6.json")).json();
+tableauCentres[6] = centresTexture6;
 const centresTexture7 = await (await fetch("./centresTexture7.json")).json();
+tableauCentres[7] = centresTexture7;
+const centresTexture8 = await (await fetch("./centresTexture8.json")).json();
+tableauCentres[8] = centresTexture8;
+const centresTexture10 = await (await fetch("./centresTexture10.json")).json();
+tableauCentres[10] = centresTexture10;
+const centresTexture11 = await (await fetch("./centresTexture11.json")).json();
+tableauCentres[11] = centresTexture11;
+const centresTexture12 = await (await fetch("./centresTexture12.json")).json();
+tableauCentres[12] = centresTexture12;
+
+
+
 
 
 const textureHerbeBasique = false;
-const numeroTexture = 11;
+const numeroTexture = 6;
+const randomizeElevation = true;
 
 //// PB : DEFINE TEXTURE ET CAMERA
 
 
 const scene = new THREE.Scene();
+
+var meshGrass;
+var meshFloor;
 
 
 var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
@@ -35,12 +54,7 @@ var compteur = 0;
 
 
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-/*const fov = 75;
-const aspect = 2;  // the canvas default
-const near = 0.1;
-const far = 5;*/
-//const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-camera.position.z = 0.5;
+//camera.position.set(0, 4, 0);
 
 const renderer = new THREE.WebGLRenderer();
 
@@ -72,14 +86,8 @@ promis.push(loadImg("graphics/freeTexture2.png"));
 promis.push(loadImg("graphics/textureGrass8.png"));
 promis.push(loadImg("graphics/fleur.png"));
 promis.push(loadImg("graphics/marguerite.png"));
-promis.push(loadImg("graphics/freeTexture11.png"))
-promis.push(loadImg("graphics/masque_freeTexture11.png"))
-
-/*
-const pierresTexture11 = [];
-for (let i = 1; i <= centresTexture11bis.length; i++) {
-  pierresTexture11.push(loadImg("graphics/Texture11/Pierre" + i + ".png"));
-}*/
+promis.push(loadImg("graphics/freeTexture" + numeroTexture +".png"))
+promis.push(loadImg("graphics/masque_freeTexture"+ numeroTexture +".png"))
 
 
 Promise.all(promis).then((imgs) => {
@@ -200,7 +208,6 @@ function createTextureCheminBasique(chemintext, masquetext, chemin, centres, rep
 
   const distancemax = 350;
 
-  console.log(masquetext);
   var w = masquetext.width;
   var h = masquetext.height;
 
@@ -512,12 +519,12 @@ function definePlane(mater, x, y, z, w, h, faces = 1) {
 
   var meshPlane = new THREE.Mesh(new THREE.PlaneGeometry(w, h, faces, faces),mater);
 
-  /*
+  
   meshPlane.rotation.x += -1 * Math.PI / 2
   meshPlane.position.x = x
   meshPlane.position.y = y
   meshPlane.position.z = z
-*/
+
   return meshPlane
 
 }
@@ -632,16 +639,16 @@ function dupliquer(centres, Xrepeat, Yrepeat, w, h) {
 
 function transformCanvastoThreeCoordonates(x, z) {
   var newx = z / 512 - 5;
-  var newy = - x / 512 + 5;
-  var newz = 0.1;
+  var newz = x / 512 - 5;
+  var newy = 0.1;
   var coordonnees = [newx, newy, newz];
   return coordonnees;
 }
 
-function transformThreeCoordonatestoCanvas(x, y) {
-  var newx = - (y - 5) * 512;
-  var newy = (x + 5) * 512;
-  var coordonnees = [newx, newy];
+function transformThreeCoordonatestoCanvas(x, z) {
+  var newx = (z + 5) * 512
+  var newz = (x + 5) * 512;
+  var coordonnees = [newx, newz];
   return coordonnees;
 }
 
@@ -677,7 +684,7 @@ function init_textures(imgs) {
   const wireframe_mode = false
 
   var chemin = computeCheminInterpol(Points);
-  var centres = dupliquer(centresTexture11, 10, 10, 512, 512);
+  var centres = dupliquer(tableauCentres[numeroTexture], 10, 10, 512, 512);
   
   var tabresult = createTextureCheminBasique(imgs[4],imgs[5], chemin, centres, 10, 10);
   var canvascheminMasque = tabresult[0];
@@ -759,21 +766,23 @@ function init(textures) {
   const ambiantLight = new THREE.AmbientLight(0xcccccc, luminosite)
   scene.add(ambiantLight);
 
-  // POSITION CAM ?????????
-  //camera.position.set(0, 4, 0);
+  // Ajout des contrôles à la souris
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+  //controls.update() doit être appelé chaque fois que la position de la caméra est modifiée manuellement
+  camera.position.set(0, 4, 0);
   controls.update();
 
   // Creation de deux plans
   const epsilon = 0.001;
 
-  const plane = definePlane(textures[0], 0, 0, 0, mapW, mapH, 10, 10);
-  plane.name = "pelouse";
-  scene.add(plane);
+  meshGrass = definePlane(textures[0], 0, 0, 0, mapW, mapH, 10, 10);
+  meshGrass.name = "pelouse";
+  scene.add(meshGrass);
 
-  const planeChemin = definePlane(textures[1], 0, epsilon, 0, mapW, mapH, 10, 10);
-  planeChemin.name = "floor";
-  scene.add(planeChemin);
+  meshFloor = definePlane(textures[1], 0, epsilon, 0, mapW, mapH, 10, 10);
+  meshFloor.name = "floor";
+  scene.add(meshFloor);
 
   // Ajout de la ligne du chemin
   var chemin = computeCheminInterpol(Points);
@@ -793,6 +802,10 @@ function init(textures) {
   var lineClick = new THREE.Line(geometryClick, materialClick);
   lineClick.name = "line";
   scene.add(lineClick);
+
+  if (randomizeElevation) {
+    randomize_elevation(0.4, 0, epsilon);
+  }
 
 }
 
@@ -815,25 +828,23 @@ function animate() {
   } else if (state.mouvementcube.bas) {
     cube.position.x += 0.03;
   } else if (state.mouvementcube.droite) {
-    cube.position.y -= 0.03;
+    cube.position.z += 0.03;
   } else if (state.mouvementcube.gauche) {
-    cube.position.y += 0.03;
+    cube.position.z -= 0.03;
   } else if (state.space) {
 
     var xenter = cube.position.x;
-    var yenter = cube.position.y;
-    var coordonnespoint = transformThreeCoordonatestoCanvas(xenter, yenter);
+    var zenter = cube.position.z;
+    var coordonnespoint = transformThreeCoordonatestoCanvas(xenter, zenter);
     Points.push(coordonnespoint);
-    console.log(Points)
 
     var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     var cubeAffichage = new THREE.Mesh(geometry, material);
     cubes.push(cubeAffichage);
-    console.log(cubes);
     cubes[compteur].name = "cube" + compteur;
     cubes[compteur].position.x = xenter;
-    cubes[compteur].position.y = yenter;
+    cubes[compteur].position.z = zenter;
     scene.add(cubes[compteur]);
     compteur = compteur + 1;
 
@@ -877,5 +888,43 @@ function animate() {
     state.rendre = false;
 
   }
+}
+
+// Assigner des élévations aléatoires aux vertices des maillages plans
+function randomize_elevation(value = 0.4, offset = 0, epsilon) {
+
+  for (let i = 0; i < meshFloor.geometry.vertices.length; i++) {
+      let random_value = Math.random()
+      meshFloor.geometry.vertices[i].z = random_value * value + offset + epsilon
+      meshGrass.geometry.vertices[i].z = random_value * value + offset
+  }
+  meshFloor.geometry.verticesNeedUpdate = true
+  meshGrass.geometry.verticesNeedUpdate = true
+
+}
+
+
+// Récupérer l'élévation correspondant à une position au sol donnée
+function zPos(x, y) {
+
+  let caseX = Math.floor(x)
+  let caseY = Math.floor(y)
+  let u = (x + 100) % 1
+  let v = (y + 100) % 1
+
+  let indexFace = 200 * (caseZ + 50) + 2 * (caseX + 50) + (u + v > 1)
+  if (meshFloor.geometry.faces[indexFace] === undefined) {
+      return 0
+  }
+  let pt1 = meshFloor.geometry.vertices[meshFloor.geometry.faces[indexFace].a]
+  let pt2 = meshFloor.geometry.vertices[meshFloor.geometry.faces[indexFace].b]
+  let pt3 = meshFloor.geometry.vertices[meshFloor.geometry.faces[indexFace].c]
+
+  if (u + v < 1) {
+      return pt1.z + (pt3.z - pt1.z) * u + (pt2.z - pt1.z) * v
+  } else {
+      return pt1.z + pt3.z - pt2.z + (pt2.z - pt1.z) * u + (pt2.z - pt3.z) * v
+  }
+
 }
 
