@@ -23,8 +23,9 @@ tableauCentres[12] = centresTexture12;
 
 const textureHerbeBasique = false;
 const numeroTexture = 11;
-const randomizeElevation = true;
-
+const randomizeElevation = false;
+const generationTerrainbool = true;
+const generationTerrainbool2 = false;
 //// PB : DEFINE TEXTURE ET CAMERA
 
 const scene = new THREE.Scene();
@@ -906,6 +907,15 @@ function init(textures) {
   if (randomizeElevation) {
     randomize_elevation(0.4, 0, epsilon);
   }
+
+  if (generationTerrainbool) {
+    generationTerrain(3, 2, 1, epsilon);
+  }
+
+  if (generationTerrainbool2) {
+    let listeElevation = [[5, 5]];
+    generationTerrain2(listeElevation, mapW, mapH);
+  }
 }
 
 function animate() {
@@ -988,6 +998,200 @@ function randomize_elevation(value = 0.4, offset = 0, epsilon) {
     let random_value = Math.random();
     meshFloor.geometry.vertices[i].z = random_value * value + offset + epsilon;
     meshGrass.geometry.vertices[i].z = random_value * value + offset;
+  }
+  meshFloor.geometry.verticesNeedUpdate = true;
+  meshGrass.geometry.verticesNeedUpdate = true;
+}
+
+class cell {
+  constructor(xc, yc, zc, statec) {
+    this.x = xc;
+    this.y = yc;
+    this.z = zc;
+    this.s = statec;
+  }
+}
+
+class hashtable {
+  constructor() {
+    this.keys = [];
+    this.values = [];
+  }
+
+  add(cell) {
+    this.keys.push(cell);
+    this.values.push([]);
+  }
+  getValues(key) {
+    for (let j = 0; j < this.keys.length; j++) {
+      let cellc = this.keys[j];
+      if (cellc.x == key.x && cellc.y == key.y) {
+        return this.values[j];
+      }
+    }
+  }
+  addValue(key, value) {
+    for (let j = 0; j < this.keys.length; j++) {
+      let cellc = this.keys[j];
+      if (cellc.x == key.x && cellc.y == key.y) {
+        this.values[j].push(value);
+      }
+    }
+  }
+}
+
+function findAscendentE(e, FQ) {
+  let A = [];
+  for (let i = 0; i < FQ.length; i++) {
+    let c = FQ[i];
+    if (c.z > e.z) {
+      A.push(c);
+    }
+  }
+  return A;
+}
+
+function distancecell(a, b) {
+  return ((b.x - a.x) ** 2 + (b.y - a.y) ** 2) ** (1 / 2);
+}
+
+function deltaBu(z, d, I, dmax) {
+  if (I >= 0) {
+    var sigma = 1;
+  } else {
+    var sigma = -1;
+  }
+  return z * (1 - sigma * (1 - (1 - d / dmax) ** Math.abs(I)));
+}
+
+function comprend(liste, point) {
+  for (let j = 0; j < liste.length; j++) {
+    if (liste[j][0] == point[0] && liste[j][1] == point[1]) {
+      return true;
+    }
+  }
+}
+
+function generationTerrain2(listeElevation, mapW, mapH, epsilon) {
+  let FQ = [];
+  for (let i = 0; i < mapH + 1; i++) {
+    for (let j = 0; j < mapW + 1; j++) {
+      if (comprend(listeElevation, [i, j])) {
+        let c = new cell(i, j, 2, 0);
+        let n = i * mapW + j;
+        meshFloor.geometry.vertices[n].z = 2 + epsilon;
+        meshGrass.geometry.vertices[n].z = 2;
+        FQ.push(c);
+      } else {
+        let c = new cell(i, j, 0, 0);
+        let n = i * mapW + j;
+        meshFloor.geometry.vertices[n].z = 1 + epsilon;
+        meshGrass.geometry.vertices[n].z = 1;
+        FQ.push(c);
+      }
+    }
+  }
+
+  while (FQ.length > 0) {
+    let T = new hashtable();
+    for (let i = 0; i < FQ.length; i++) {
+      let e = FQ[i];
+      let A = findAscendentE(e, FQ);
+      for (let j = 0; j < A.length; j++) {
+        let ac = A[j];
+        if (ac.s == 0) {
+          T.add(ac);
+          T.addValue(ac, e);
+        }
+      }
+    }
+    FQ = [];
+    for (let i = 0; i < T.keys.length; i++) {
+      let e = 0;
+      let n = 0;
+      let ac = T.keys[i];
+      let children = T.getValues(ac);
+      for (let j = 0; j < children.length; j++) {
+        let c = children[j];
+
+        e = e + deltaBu(c.z, distancecell(ac, c), 6, 2);
+        n = n + 1;
+      }
+      ac.z = e / n;
+
+      let x = ac.x;
+      let y = ac.y;
+      n = x * mapW + y;
+      meshFloor.geometry.vertices[n].z = ac.z + epsilon;
+      meshGrass.geometry.vertices[n].z = ac.z;
+
+      ac.s = 1;
+      FQ.push(ac);
+    }
+  }
+  console.log("fini");
+  meshFloor.geometry.verticesNeedUpdate = true;
+  meshGrass.geometry.verticesNeedUpdate = true;
+  console.log(scene);
+}
+
+function generationTerrain(octave, lambda, h, epsilon) {
+  // génération heightmap
+  let heightmap = [];
+  for (let i = 0; i < meshFloor.geometry.vertices.length; i++) {
+    let x = meshFloor.geometry.vertices[i].x;
+    let y = meshFloor.geometry.vertices[i].y;
+    let z = meshFloor.geometry.vertices[i].z;
+    let simplex = new SimplexNoise();
+
+    for (let j = 0; j < octave - 1; j++) {
+      z = z + simplex.noise2D(x * lambda ** j, y * lambda ** j) / lambda ** h;
+    }
+
+    heightmap.push(z);
+  }
+
+  //Génération slopemap
+
+  for (let i = 0; i < 11; i++) {
+    for (let j = 0; j < 11; j++) {
+      let n = i * 11 + j;
+
+      // Calcul gradient
+      //gauche
+      if (n - 1 > 0) {
+        var gauche = heightmap[n - 1];
+      } else {
+        var gauche = 0;
+      }
+      //droite
+      if (n + 1 < meshFloor.geometry.vertices.length) {
+        var droite = heightmap[n + 1];
+      } else {
+        var droite = 0;
+      }
+
+      //haut
+      if (n - 11 > 0) {
+        var haut = heightmap[n - 11];
+      } else {
+        var haut = 0;
+      }
+
+      //bas
+      if (n + 11 > 0) {
+        var bas = heightmap[n + 11];
+      } else {
+        var bas = 0;
+      }
+
+      let hx = -1 * gauche + droite;
+
+      let hy = -1 * haut + bas;
+
+      meshFloor.geometry.vertices[n].z = (hx ** 2 + hy ** 2) ** 0.5 + epsilon;
+      meshGrass.geometry.vertices[n].z = (hx ** 2 + hy ** 2) ** 0.5;
+    }
   }
   meshFloor.geometry.verticesNeedUpdate = true;
   meshGrass.geometry.verticesNeedUpdate = true;
