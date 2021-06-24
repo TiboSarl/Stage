@@ -1,6 +1,6 @@
-const centresTexture11bis = await (await fetch("./centresTexture11bis.json")).json();
-
 var tableauCentres = [0,0,0,0,0,0,0,0,0,0,0,0];
+var tableauCentresBis = [0,0,0,0,0,0,0,0,0,0,0,0];
+var tableauCentresBis_vrais = [0,0,0,0,0,0,0,0,0,0,0,0];
 
 
 const centresTexture3 = await (await fetch("./centresTexture3.json")).json();
@@ -21,22 +21,36 @@ const centresTexture12 = await (await fetch("./centresTexture12.json")).json();
 tableauCentres[12] = centresTexture12;
 
 
+const centresTexture10bis = await (await fetch("./centresTexture10bis.json")).json();
+tableauCentresBis[10] = centresTexture10bis;
+const centresTexture10bis_vrais = await (await fetch("./centresTexture10bis_vrais.json")).json();
+tableauCentresBis_vrais[10] = centresTexture10bis_vrais;
+const centresTexture11bis = await (await fetch("./centresTexture11bis.json")).json();
+tableauCentresBis[11] = centresTexture11bis;
 
 
 
+
+// PARAMS
 const textureHerbeBasique = false;
-const numeroTexture = 11;
-const randomizeElevation = true;
+const textureCheminBasique = false;
+const decalageHerbe = true;
+const numeroTexture = 10;
+const randomizeElevation = false;
 
-//// PB : DEFINE TEXTURE ET CAMERA
 
+const nbPierres = tableauCentresBis[numeroTexture].length;
+console.log(tableauCentresBis[numeroTexture].length)
+console.log(tableauCentresBis_vrais[numeroTexture].length)
 
 const scene = new THREE.Scene();
 
+// pour randomize elevation
 var meshGrass;
 var meshFloor;
 
 
+// pour tracer des chemins
 var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
 var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
@@ -53,8 +67,8 @@ var cubes = [];
 var compteur = 0;
 
 
+// cam et renderer
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-//camera.position.set(0, 4, 0);
 
 const renderer = new THREE.WebGLRenderer();
 
@@ -63,6 +77,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 var controls = new THREE.OrbitControls(scene, camera);
 document.body.appendChild(renderer.domElement);
 
+// pour controle des touches
 let state = {
   mouvement: { haut: false, bas: false, droite: false, gauche: false },
   mouvementcube: { haut: false, bas: false, droite: false, gauche: false },
@@ -71,6 +86,11 @@ let state = {
   rendre: false,
   dejacube: false,
 };
+
+///////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 
 
 const loadImg = async (url) =>
@@ -88,6 +108,10 @@ promis.push(loadImg("graphics/fleur.png"));
 promis.push(loadImg("graphics/marguerite.png"));
 promis.push(loadImg("graphics/freeTexture" + numeroTexture +".png"))
 promis.push(loadImg("graphics/masque_freeTexture"+ numeroTexture +".png"))
+
+for (let i = 1; i <= nbPierres; i++) {
+  promis.push(loadImg("graphics/Texture" + numeroTexture + "/Pierre" + i + ".png"));
+}
 
 
 Promise.all(promis).then((imgs) => {
@@ -132,19 +156,23 @@ function createTextureHerbe(fleurs, herbetext, repeatX, repeatY) {
         var decalage = Math.random();
         var decalage2 = Math.random();
 
-        //ctx.drawImage(herbetext, w*wr,h*hr, w, h, w * i, j * h, w, h);
+        if (decalageHerbe) {
+          ctx.drawImage(herbetext,w * wr, h * hr, w * decalage, h * decalage2, w * i + w * (1 - decalage),
+            j * h + h * (1 - decalage2), w * decalage, h * decalage2);
 
-        ctx.drawImage(herbetext,w * wr, h * hr, w * decalage, h * decalage2, w * i + w * (1 - decalage),
-          j * h + h * (1 - decalage2), w * decalage, h * decalage2);
+          ctx.drawImage(herbetext, w * wr + w * decalage, h * hr, w - w * decalage, h * decalage2, w * i,
+            j * h + h * (1 - decalage2),w - w * decalage,h * decalage2);
 
-        ctx.drawImage(herbetext, w * wr + w * decalage, h * hr, w - w * decalage, h * decalage2, w * i,
-          j * h + h * (1 - decalage2),w - w * decalage,h * decalage2);
+          ctx.drawImage(herbetext,w * wr, h * hr + h * decalage2,w * decalage,h * (1 - decalage2),
+            w * i + w * (1 - decalage),j * h,w * decalage,h * (1 - decalage2));
 
-        ctx.drawImage(herbetext,w * wr, h * hr + h * decalage2,w * decalage,h * (1 - decalage2),
-          w * i + w * (1 - decalage),j * h,w * decalage,h * (1 - decalage2));
+          ctx.drawImage(herbetext,w * wr + w * decalage,h * hr + h * decalage2,w - w * decalage,
+            h - h * decalage2, w * i,j * h,w - w * decalage,h - h * decalage2);
 
-        ctx.drawImage(herbetext,w * wr + w * decalage,h * hr + h * decalage2,w - w * decalage,
-          h - h * decalage2, w * i,j * h,w - w * decalage,h - h * decalage2);
+        } else {
+          ctx.drawImage(herbetext, w*wr,h*hr, w, h, w * i, j * h, w, h);
+        }
+        
 
     }
 }
@@ -531,6 +559,92 @@ function recupPierre(masquedata, copyMasquedata, point, w, h) {
 }
 
 
+function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vrais, wtot, htot, repeatX, repeatY) {
+
+  const distancemaxPierre = 1000;
+  const distancemax = 450;
+  const distancemaxherbe = 350;
+
+  // masque
+  var w = masquetext.width;
+  var h = masquetext.height;
+
+  var canvasmasque = document.createElement('canvas');
+  canvasmasque.width = w * repeatX;
+  canvasmasque.height = h * repeatY;
+
+  var ctxmasque = canvasmasque.getContext('2d');
+  for (let i = 0; i < repeatX; i++) {
+      for (let j = 0; j < repeatY; j++) {
+          ctxmasque.drawImage(masquetext, 0, 0, w, h, w * i, j * h, w, h);
+      }
+  }
+
+  // canvas des pierres
+  var canvas = document.createElement('canvas');
+  canvas.width = wtot * repeatX;
+  canvas.height = htot * repeatY;
+
+  var ctx = canvas.getContext('2d');
+
+  var germes = [];
+  var point;
+  var point_vrai;
+  for (let i = 0; i < centres_vrais.length; i++) {
+      point_vrai = centres_vrais[i];
+      point = centres[i];
+      
+      //var r1 = Math.random();
+      //var r2 = Math.random();
+      
+      if (distancechemin(point_vrai, chemin) < distancemax) {
+        germes.push(point);
+    }
+  }
+
+  var numeroPierre;
+  var x;
+  var y;
+  var imw;
+  var imh;
+  var image;
+  for (let k = 0; k < germes.length; k++) {
+    numeroPierre = germes[k][2] % nbPierres;
+      image = imgs[numeroPierre];
+      imw = image.width;
+      imh = image.height;
+      x = germes[k][0];
+      y = germes[k][1];
+      ctx.drawImage(image, 0,0, imw,imh, y, x, imw, imh);
+
+    
+
+  }
+
+
+  /*
+  
+  //var canvasdata;
+  var canvasdatacopy;
+  for (let k = 0; k < germes.length; k++) {
+      canvasdatacopy = recupPierre(noirdata, masquedata, germes[k], w * repeatX, h * repeatY);
+      noirdata = canvasdatacopy;
+    }
+
+  ctxnoir.putImageData(noirdata, 0, 0);*/
+
+  return [canvasmasque, canvas]
+
+}
+
+function recupPierreImage(canvas, img, point, w, h) {
+
+
+
+}
+
+
+
 
 
 // Fonction pour définir une texture
@@ -679,7 +793,7 @@ function dupliquer(centres, Xrepeat, Yrepeat, w, h) {
       for (let j = 0; j < Yrepeat; j++) {
         var xnouveau = x + i * w;
         var ynouveau = y + j * h;
-        T.push([xnouveau, ynouveau]);
+        T.push([xnouveau, ynouveau, k]);
       }
     }
   }
@@ -723,34 +837,76 @@ function init_textures(imgs) {
     var texture = defineTextureCanvas(canvasherbe, 0, 0, false);
     texture.minFilter = THREE.LinearFilter;
 
-
-
-    //const texture = defineTexture(textureGrass,10,10,true);
     materialFond = new THREE.MeshBasicMaterial({map: texture,side: THREE.DoubleSide});
   }
 
 
   /////////// CHEMIN /////////
-  const wireframe_mode = false
 
-  var chemin = computeCheminInterpol(Points);
-  var centres = dupliquer(tableauCentres[numeroTexture], 10, 10, 512, 512);
+  var materialChemin;
+
+  if (textureCheminBasique) {
+
+    var chemin = computeCheminInterpol(Points);
+    var centres = dupliquer(tableauCentres[numeroTexture], 10, 10, 512, 512);
   
-  var tabresult = createTextureCheminBasique(imgs[4],imgs[5], chemin, centres, 10, 10);
-  var canvascheminMasque = tabresult[0];
-  var canvaschemin = tabresult[1];
+    var tabresult = createTextureCheminBasique(imgs[4],imgs[5], chemin, centres, 10, 10);
+    var canvascheminMasque = tabresult[0];
+    var canvaschemin = tabresult[1];
 
 
-  const textureChemin = defineTextureCanvas(canvaschemin, 0, 0, false);
-  textureChemin.minFilter = THREE.LinearFilter;
+    const textureChemin = defineTextureCanvas(canvaschemin, 0, 0, false);
+    textureChemin.minFilter = THREE.LinearFilter;
 
-  const textureCheminMasque = defineTextureCanvas(canvascheminMasque, 0, 0, false);
-  textureCheminMasque.minFilter = THREE.LinearFilter;
+    const textureCheminMasque = defineTextureCanvas(canvascheminMasque, 0, 0, false);
+    textureCheminMasque.minFilter = THREE.LinearFilter;
+    
+    materialChemin = new THREE.MeshBasicMaterial({alphaMap : textureCheminMasque, alphaTest : 0.5, map: textureChemin,  side: THREE.DoubleSide});
+
+  } else {
+
+    var chemin = computeCheminInterpol(Points);
+    var centres = dupliquer(tableauCentresBis[numeroTexture], 10, 10, 512, 512);
+    var centres_vrais = dupliquer(tableauCentresBis_vrais[numeroTexture], 10, 10, 512, 512);
+
+    var images = imgs.splice(6, nbPierres,);
+
+    /*
+    var centres = [];
+    for (let i=0; i<images.length; i++) {
+      var im = images[i];
+      console.log(im)
+      var w = im.width;
+      var h = im.height;
+      var centrex = centresTexture10bis[i][1] + w / 2;
+      var centrey = centresTexture10bis[i][0] + h/ 2;
+      if (centrex > 512) {
+        centrex = centrex - 512;
+      }
+      if (centrey > 512) {
+        centrey = centrey - 512;
+      }
+      centres.push([centrex, centrey]);
+    }
+    console.log(centres)
+    console.log(images.length)*/
+
+    var tabresult = createTextureCheminEvolue(imgs[5], images, chemin, centres, centres_vrais, 512, 512, 10, 10);
+    var canvascheminMasque = tabresult[0];
+    var canvaschemin = tabresult[1];
+
+
+    const textureChemin = defineTextureCanvas(canvaschemin, 0, 0, false);
+    textureChemin.minFilter = THREE.LinearFilter;
+
+    const textureCheminMasque = defineTextureCanvas(canvascheminMasque, 0, 0, false);
+    textureCheminMasque.minFilter = THREE.LinearFilter;
+    
+    materialChemin = new THREE.MeshBasicMaterial({alphaMap : textureCheminMasque, alphaTest : 0.5, map: textureChemin,  side: THREE.DoubleSide});
+  }
   
-  const materialChemin = new THREE.MeshBasicMaterial({alphaMap : textureCheminMasque, alphaTest : 0.5, map: textureChemin,wireframe: wireframe_mode,  side: THREE.DoubleSide});
 
-
-  return Promise.resolve([materialFond, materialChemin, imgs[4], imgs[5]])
+  return Promise.resolve([materialFond, materialChemin])
   
 }
 
