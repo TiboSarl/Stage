@@ -40,8 +40,6 @@ const randomizeElevation = false;
 
 
 const nbPierres = tableauCentresBis[numeroTexture].length;
-console.log(tableauCentresBis[numeroTexture].length)
-console.log(tableauCentresBis_vrais[numeroTexture].length)
 
 const scene = new THREE.Scene();
 
@@ -598,7 +596,7 @@ function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vr
       //var r2 = Math.random();
       
       if (distancechemin(point_vrai, chemin) < distancemax) {
-        germes.push(point);
+        germes.push(point_vrai);
     }
   }
 
@@ -613,25 +611,15 @@ function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vr
       image = imgs[numeroPierre];
       imw = image.width;
       imh = image.height;
-      x = germes[k][0];
-      y = germes[k][1];
-      ctx.drawImage(image, 0,0, imw,imh, y, x, imw, imh);
-
-    
+      x = germes[k][0] - imh/2;
+      y = germes[k][1] - imw/2;
+      
+      if (x > 0 & y > 0) {
+        ctx.drawImage(image, 0,0, imw,imh, y, x, imw, imh);
+      }
 
   }
 
-
-  /*
-  
-  //var canvasdata;
-  var canvasdatacopy;
-  for (let k = 0; k < germes.length; k++) {
-      canvasdatacopy = recupPierre(noirdata, masquedata, germes[k], w * repeatX, h * repeatY);
-      noirdata = canvasdatacopy;
-    }
-
-  ctxnoir.putImageData(noirdata, 0, 0);*/
 
   return [canvasmasque, canvas]
 
