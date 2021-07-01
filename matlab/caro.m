@@ -41,10 +41,10 @@ Iaug = double(Iaug);
 CC = bwconncomp(Iaug);
 list = CC.PixelIdxList;
 centres = [];
-%fid = fopen(nom +"/centrebis"+ nom +".json",'w');
-%fprintf(fid,'[');
-%premier = true;
-
+fid = fopen(nom +"/centrebis"+ nom +".json",'w');
+fprintf(fid,'[');
+premier = true;
+compteur=1;
 for k = 1:length(list)
 
 Pierre1 = list{k};
@@ -61,19 +61,26 @@ PierreTex = uint8(PierreTex);
 A =  double(Pierre(:,:,1) ==255);
 
 [Irec,Arec,coinhautgauche] = recadrage(PierreTex,A);
-centres = [centres; [coinhautgauche(1) coinhautgauche(2)]];
-imwrite(Irec, nom  + '/pierre'+ k +'.png','Alpha',Arec);
-%coinhautgauche1 = coinhautgauche(1);
-%coinhautgauche2 = coinhautgauche(2);
-% if(~premier)
-%     fprintf(fid, ',');
-% end
-% fprintf(fid,'[%i', coinhautgauche1);
-% fprintf(fid,',');
-% fprintf(fid,'%i ]',coinhautgauche2);
-% premier = false;
-end
-% fprintf(fid,']');
-% fclose(fid);
 
-supprdoublonetcoupe(nom,centres,nblignes,nbcols);
+x = coinhautgauche(1);
+y = coinhautgauche(2);
+
+if ((x > (nblignes/2) && x < (3/2 * nblignes) && y>(nbcols/2) && y< (3/2*nbcols)))
+    if(~premier)
+        fprintf(fid, ',');
+    end
+    fprintf(fid,'[%i', x-round(nblignes/2));
+    fprintf(fid,',');
+    fprintf(fid,'%i ]',y-round(nbcols/2));
+    premier = false;
+    imwrite(Irec, nom  + '/Pierre'+ compteur +'.png','Alpha',Arec);
+    compteur = compteur +1;
+end
+
+
+
+
+end
+fprintf(fid,']');
+fclose(fid);
+
