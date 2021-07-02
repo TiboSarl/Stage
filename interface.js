@@ -1,7 +1,6 @@
-var tableauCentres = [0,0,0,0,0,0,0,0,0,0,0,0];
-var tableauCentresBis = [0,0,0,0,0,0,0,0,0,0,0,0];
-var tableauCentresBis_vrais = [0,0,0,0,0,0,0,0,0,0,0,0];
-
+var tableauCentres = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var tableauCentresBis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var tableauCentresBis_vrais = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 const centresTexture3 = await (await fetch("./centresTexture3.json")).json();
 tableauCentres[3] = centresTexture3;
@@ -20,35 +19,45 @@ tableauCentres[11] = centresTexture11;
 const centresTexture12 = await (await fetch("./centresTexture12.json")).json();
 tableauCentres[12] = centresTexture12;
 
+const centresTexture3bis = await (
+  await fetch("./centrebisfreeTexture3.json")
+).json();
+tableauCentresBis[3] = centresTexture3bis;
 
-const centresTexture10bis = await (await fetch("./centresTexture10bis.json")).json();
+const centresTexture8bis = await (
+  await fetch("./centrebisfreeTexture8bis.json")
+).json();
+tableauCentresBis[8] = centresTexture8bis;
+
+const centresTexture10bis = await (
+  await fetch("./centresTexture10bis.json")
+).json();
 tableauCentresBis[10] = centresTexture10bis;
-const centresTexture10bis_vrais = await (await fetch("./centresTexture10bis_vrais.json")).json();
+const centresTexture10bis_vrais = await (
+  await fetch("./centresTexture10bis_vrais.json")
+).json();
 tableauCentresBis_vrais[10] = centresTexture10bis_vrais;
-const centresTexture11bis = await (await fetch("./centresTexture11bis.json")).json();
+const centresTexture11bis = await (
+  await fetch("./centresTexture11bis.json")
+).json();
 tableauCentresBis[11] = centresTexture11bis;
-
-
-
 
 // PARAMS
 const textureHerbeBasique = false;
 const textureCheminBasique = false;
 const decalageHerbe = true;
-const numeroTexture = 10;
+const numeroTexture = 3;
 const randomizeElevation = false;
 
-
 const nbPierres = tableauCentresBis[numeroTexture].length;
-console.log(tableauCentresBis[numeroTexture].length)
-console.log(tableauCentresBis_vrais[numeroTexture].length)
+console.log(tableauCentresBis[numeroTexture].length);
+console.log(tableauCentresBis_vrais[numeroTexture].length);
 
 const scene = new THREE.Scene();
 
 // pour randomize elevation
 var meshGrass;
 var meshFloor;
-
 
 // pour tracer des chemins
 var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
@@ -66,12 +75,15 @@ var Points = [
 var cubes = [];
 var compteur = 0;
 
-
 // cam et renderer
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+var camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  100
+);
 
 const renderer = new THREE.WebGLRenderer();
-
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 var controls = new THREE.OrbitControls(scene, camera);
@@ -92,7 +104,6 @@ let state = {
 /////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-
 const loadImg = async (url) =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -106,13 +117,14 @@ promis.push(loadImg("graphics/freeTexture2.png"));
 promis.push(loadImg("graphics/textureGrass8.png"));
 promis.push(loadImg("graphics/fleur.png"));
 promis.push(loadImg("graphics/marguerite.png"));
-promis.push(loadImg("graphics/freeTexture" + numeroTexture +".png"))
-promis.push(loadImg("graphics/masque_freeTexture"+ numeroTexture +".png"))
+promis.push(loadImg("graphics/freeTexture" + numeroTexture + ".png"));
+promis.push(loadImg("graphics/masque_freeTexture" + numeroTexture + ".png"));
 
 for (let i = 1; i <= nbPierres; i++) {
-  promis.push(loadImg("graphics/Texture" + numeroTexture + "/Pierre" + i + ".png"));
+  promis.push(
+    loadImg("graphics/Texture" + numeroTexture + "/Pierre" + i + ".png")
+  );
 }
-
 
 Promise.all(promis).then((imgs) => {
   init_textures(imgs).then((textures) => {
@@ -121,26 +133,24 @@ Promise.all(promis).then((imgs) => {
   });
 });
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 
-
 function createTextureHerbe(fleurs, herbetext, repeatX, repeatY) {
-
   // Create a Canvas element
-  var canvasherbe = document.createElement('canvas');
+  var canvasherbe = document.createElement("canvas");
 
   // Draw image onto the canvas
-  var ctx = canvasherbe.getContext('2d');
+  var ctx = canvasherbe.getContext("2d");
 
-  var wtot = herbetext.width, htot = herbetext.height;
+  var wtot = herbetext.width,
+    htot = herbetext.height;
 
-  var w = wtot/2;
-  var h = htot/4;
+  var w = wtot / 2;
+  var h = htot / 4;
 
   // Size the canvas to the element
   canvasherbe.width = w * repeatX;
@@ -149,62 +159,102 @@ function createTextureHerbe(fleurs, herbetext, repeatX, repeatY) {
   // PELOUSE //
   for (let i = 0; i < repeatX; i++) {
     for (let j = 0; j < repeatY; j++) {
+      var wr = Math.floor(Math.random() * 2);
+      var hr = Math.floor(Math.random() * 4);
 
-        var wr = Math.floor(Math.random() * 2);
-        var hr = Math.floor(Math.random() * 4);
+      var decalage = Math.random();
+      var decalage2 = Math.random();
 
-        var decalage = Math.random();
-        var decalage2 = Math.random();
+      if (decalageHerbe) {
+        ctx.drawImage(
+          herbetext,
+          w * wr,
+          h * hr,
+          w * decalage,
+          h * decalage2,
+          w * i + w * (1 - decalage),
+          j * h + h * (1 - decalage2),
+          w * decalage,
+          h * decalage2
+        );
 
-        if (decalageHerbe) {
-          ctx.drawImage(herbetext,w * wr, h * hr, w * decalage, h * decalage2, w * i + w * (1 - decalage),
-            j * h + h * (1 - decalage2), w * decalage, h * decalage2);
+        ctx.drawImage(
+          herbetext,
+          w * wr + w * decalage,
+          h * hr,
+          w - w * decalage,
+          h * decalage2,
+          w * i,
+          j * h + h * (1 - decalage2),
+          w - w * decalage,
+          h * decalage2
+        );
 
-          ctx.drawImage(herbetext, w * wr + w * decalage, h * hr, w - w * decalage, h * decalage2, w * i,
-            j * h + h * (1 - decalage2),w - w * decalage,h * decalage2);
+        ctx.drawImage(
+          herbetext,
+          w * wr,
+          h * hr + h * decalage2,
+          w * decalage,
+          h * (1 - decalage2),
+          w * i + w * (1 - decalage),
+          j * h,
+          w * decalage,
+          h * (1 - decalage2)
+        );
 
-          ctx.drawImage(herbetext,w * wr, h * hr + h * decalage2,w * decalage,h * (1 - decalage2),
-            w * i + w * (1 - decalage),j * h,w * decalage,h * (1 - decalage2));
-
-          ctx.drawImage(herbetext,w * wr + w * decalage,h * hr + h * decalage2,w - w * decalage,
-            h - h * decalage2, w * i,j * h,w - w * decalage,h - h * decalage2);
-
-        } else {
-          ctx.drawImage(herbetext, w*wr,h*hr, w, h, w * i, j * h, w, h);
-        }
-        
-
+        ctx.drawImage(
+          herbetext,
+          w * wr + w * decalage,
+          h * hr + h * decalage2,
+          w - w * decalage,
+          h - h * decalage2,
+          w * i,
+          j * h,
+          w - w * decalage,
+          h - h * decalage2
+        );
+      } else {
+        ctx.drawImage(herbetext, w * wr, h * hr, w, h, w * i, j * h, w, h);
+      }
     }
-}
-
-// FLEURS //
-var nbFleurs = 20;
-var nbSorteFleurs = fleurs.length;
-var taillesFleurs = [];
-
-for (let i = 0; i < nbSorteFleurs; i++) {
-  var wf = fleurs[i].width;
-  var hf = fleurs[i].height;
-  taillesFleurs.push([wf,hf]);
-}
-
-for (let i = 0; i < nbSorteFleurs; i++) {
-  for (let j = 0; j < nbFleurs; j++) {
-
-    var x = Math.floor(Math.random() * w * repeatX);
-    var y = Math.floor(Math.random() * h * repeatY);
-  
-    var max = 3;
-    var min = 5;
-    
-    var size = Math.random() * (max-min) +min;
-    ctx.drawImage(fleurs[i],0,0,taillesFleurs[i][0],taillesFleurs[i][1], x, y, taillesFleurs[i][0]/size,taillesFleurs[i][1]/size);
   }
-}  
 
-  return canvasherbe
+  // FLEURS //
+  var nbFleurs = 20;
+  var nbSorteFleurs = fleurs.length;
+  var taillesFleurs = [];
+
+  for (let i = 0; i < nbSorteFleurs; i++) {
+    var wf = fleurs[i].width;
+    var hf = fleurs[i].height;
+    taillesFleurs.push([wf, hf]);
+  }
+
+  for (let i = 0; i < nbSorteFleurs; i++) {
+    for (let j = 0; j < nbFleurs; j++) {
+      var x = Math.floor(Math.random() * w * repeatX);
+      var y = Math.floor(Math.random() * h * repeatY);
+
+      var max = 3;
+      var min = 5;
+
+      var size = Math.random() * (max - min) + min;
+      ctx.drawImage(
+        fleurs[i],
+        0,
+        0,
+        taillesFleurs[i][0],
+        taillesFleurs[i][1],
+        x,
+        y,
+        taillesFleurs[i][0] / size,
+        taillesFleurs[i][1] / size
+      );
+    }
+  }
+
+  return canvasherbe;
 }
-
 
 function distancechemin(point, chemin) {
   var min = 100000000000000;
@@ -212,11 +262,13 @@ function distancechemin(point, chemin) {
   var distance;
 
   for (let i = 0; i < chemin.length; i++) {
-      pc = chemin[i];
-      distance = Math.sqrt(Math.pow(pc[0] - point[0], 2) + Math.pow(pc[1] - point[1], 2));
-      if (distance < min) {
-          min = distance;
-      }
+    pc = chemin[i];
+    distance = Math.sqrt(
+      Math.pow(pc[0] - point[0], 2) + Math.pow(pc[1] - point[1], 2)
+    );
+    if (distance < min) {
+      min = distance;
+    }
   }
 
   return min;
@@ -261,8 +313,14 @@ function tasdepierre(point, nbPierres, centres) {
   return pierres;
 }
 
-function createTextureCheminBasique(chemintext, masquetext, chemin, centres, repeatX, repeatY) {
-
+function createTextureCheminBasique(
+  chemintext,
+  masquetext,
+  chemin,
+  centres,
+  repeatX,
+  repeatY
+) {
   const distancemaxPierre = 1000;
   const distancemax = 450;
   const distancemaxherbe = 350;
@@ -270,230 +328,230 @@ function createTextureCheminBasique(chemintext, masquetext, chemin, centres, rep
   var w = masquetext.width;
   var h = masquetext.height;
 
-  var canvasmasque = document.createElement('canvas');
+  var canvasmasque = document.createElement("canvas");
   canvasmasque.width = w * repeatX;
   canvasmasque.height = h * repeatY;
 
-  var ctxmasque = canvasmasque.getContext('2d');
+  var ctxmasque = canvasmasque.getContext("2d");
   for (let i = 0; i < repeatX; i++) {
-      for (let j = 0; j < repeatY; j++) {
-          ctxmasque.drawImage(masquetext, 0, 0, w, h, w * i, j * h, w, h);
-      }
+    for (let j = 0; j < repeatY; j++) {
+      ctxmasque.drawImage(masquetext, 0, 0, w, h, w * i, j * h, w, h);
+    }
   }
 
-
-  var canvaschemin = document.createElement('canvas');
+  var canvaschemin = document.createElement("canvas");
   canvaschemin.width = w * repeatX;
   canvaschemin.height = h * repeatY;
 
-  var ctxchemin = canvaschemin.getContext('2d');
+  var ctxchemin = canvaschemin.getContext("2d");
   for (let i = 0; i < repeatX; i++) {
-      for (let j = 0; j < repeatY; j++) {
-          ctxchemin.drawImage(chemintext, 0, 0, w, h, w * i, j * h, w, h);
-      }
+    for (let j = 0; j < repeatY; j++) {
+      ctxchemin.drawImage(chemintext, 0, 0, w, h, w * i, j * h, w, h);
+    }
   }
 
-  var masquedata = ctxmasque.getImageData(0,0,w*repeatX, h*repeatY);
+  var masquedata = ctxmasque.getImageData(0, 0, w * repeatX, h * repeatY);
 
-  var canvasnoir = document.createElement('canvas');
+  var canvasnoir = document.createElement("canvas");
   canvasnoir.width = w * repeatX;
   canvasnoir.height = h * repeatY;
 
-  var ctxnoir = canvasnoir.getContext('2d');
-  var noirdata = ctxnoir.getImageData(0,0,w*repeatX, h*repeatY);
+  var ctxnoir = canvasnoir.getContext("2d");
+  var noirdata = ctxnoir.getImageData(0, 0, w * repeatX, h * repeatY);
 
   var germes = [];
   var point;
   for (let i = 0; i < centres.length; i++) {
-      point = centres[i];
-      var r1 = Math.random();
-      var r2 = Math.random();
-      if (distancechemin(point, chemin) < distancemaxherbe) {
-        germes.push(point);
-      } else if (
-        distancechemin(point, chemin) > distancemaxherbe &&
-        distancechemin(point, chemin) < distancemax
-      ) {
-        if (r1 < 0.3) [germes.push(point)];
-      } else if (
-        distancechemin(point, chemin) > distancemax &&
-        distancechemin(point, chemin) < distancemaxPierre
-      ) {
-        if (r2 < 0.01) {
-          var nbPierres = Math.random() * 10;
-          var Pierres = tasdepierre(point, nbPierres, centres);
-  
-          for (let l = 0; l < Pierres.length; l++) {
-            germes.push(Pierres[l]);
-          }
+    point = centres[i];
+    var r1 = Math.random();
+    var r2 = Math.random();
+    if (distancechemin(point, chemin) < distancemaxherbe) {
+      germes.push(point);
+    } else if (
+      distancechemin(point, chemin) > distancemaxherbe &&
+      distancechemin(point, chemin) < distancemax
+    ) {
+      if (r1 < 0.3) [germes.push(point)];
+    } else if (
+      distancechemin(point, chemin) > distancemax &&
+      distancechemin(point, chemin) < distancemaxPierre
+    ) {
+      if (r2 < 0.01) {
+        var nbPierres = Math.random() * 10;
+        var Pierres = tasdepierre(point, nbPierres, centres);
+
+        for (let l = 0; l < Pierres.length; l++) {
+          germes.push(Pierres[l]);
         }
       }
+    }
   }
-  
+
   //var canvasdata;
   var canvasdatacopy;
   for (let k = 0; k < germes.length; k++) {
-      canvasdatacopy = recupPierre(noirdata, masquedata, germes[k], w * repeatX, h * repeatY);
-      noirdata = canvasdatacopy;
-    }
+    canvasdatacopy = recupPierre(
+      noirdata,
+      masquedata,
+      germes[k],
+      w * repeatX,
+      h * repeatY
+    );
+    noirdata = canvasdatacopy;
+  }
 
-  ctxnoir.putImageData(noirdata, 0, 0); 
+  ctxnoir.putImageData(noirdata, 0, 0);
 
-  return [canvasnoir, canvaschemin]
-
+  return [canvasnoir, canvaschemin];
 }
 
 function recupPierre(masquedata, copyMasquedata, point, w, h) {
-
   var ipoint = point[0];
   var jpoint = point[1];
-  var n = ipoint * w + jpoint
+  var n = ipoint * w + jpoint;
 
   // point centre
-  var lignehorizontal = [n]
-  if (copyMasquedata.data[4*n] == 255) {
-      masquedata.data[4 * n] = 255
-      masquedata.data[4 * n + 1] = 255
-      masquedata.data[4 * n + 2] = 255
-      masquedata.data[4 * n + 3] = 255
+  var lignehorizontal = [n];
+  if (copyMasquedata.data[4 * n] == 255) {
+    masquedata.data[4 * n] = 255;
+    masquedata.data[4 * n + 1] = 255;
+    masquedata.data[4 * n + 2] = 255;
+    masquedata.data[4 * n + 3] = 255;
   }
 
   // ligne horizontale gauche
-  var ind = n
-  var gauche = copyMasquedata.data[4 * (ind - 1)]
+  var ind = n;
+  var gauche = copyMasquedata.data[4 * (ind - 1)];
   while (gauche == 255 && ind - 1 != 0) {
-      masquedata.data[4 * (ind - 1)] = 255
-      masquedata.data[4 * (ind - 1) + 1] = 255
-      masquedata.data[4 * (ind - 1) + 2] = 255
-      masquedata.data[4 * (ind - 1) + 3] = 255
-      ind = ind - 1;
-      lignehorizontal.push(ind)
-      gauche = copyMasquedata.data[4 * (ind - 1)]
+    masquedata.data[4 * (ind - 1)] = 255;
+    masquedata.data[4 * (ind - 1) + 1] = 255;
+    masquedata.data[4 * (ind - 1) + 2] = 255;
+    masquedata.data[4 * (ind - 1) + 3] = 255;
+    ind = ind - 1;
+    lignehorizontal.push(ind);
+    gauche = copyMasquedata.data[4 * (ind - 1)];
   }
 
   // ligne horizontale droite
-  var ind = n
-  var droite = copyMasquedata.data[4 * (ind + 1)]
+  var ind = n;
+  var droite = copyMasquedata.data[4 * (ind + 1)];
   while (droite == 255 && ind + 1 != 0) {
-      masquedata.data[4 * (ind + 1)] = 255
-      masquedata.data[4 * (ind + 1) + 1] = 255
-      masquedata.data[4 * (ind + 1) + 2] = 255
-      masquedata.data[4 * (ind + 1) + 3] = 255
-      ind = ind + 1;
-      lignehorizontal.push(ind)
-      droite = copyMasquedata.data[4 * (ind + 1)]
+    masquedata.data[4 * (ind + 1)] = 255;
+    masquedata.data[4 * (ind + 1) + 1] = 255;
+    masquedata.data[4 * (ind + 1) + 2] = 255;
+    masquedata.data[4 * (ind + 1) + 3] = 255;
+    ind = ind + 1;
+    lignehorizontal.push(ind);
+    droite = copyMasquedata.data[4 * (ind + 1)];
   }
 
   // ligne verticale
-  var lignevertical = []
+  var lignevertical = [];
 
   // ligne verticale bas
   var ind = n;
   var indMoins1 = ind - w;
-  var bas = copyMasquedata.data[4 * indMoins1]
+  var bas = copyMasquedata.data[4 * indMoins1];
   while (bas == 255 && indMoins1 != 0) {
-      masquedata.data[4 * indMoins1] = 255
-      masquedata.data[4 * indMoins1 + 1] = 255
-      masquedata.data[4 * indMoins1 + 2] = 255
-      masquedata.data[4 * indMoins1 + 3] = 255
-      //ind = indMoins1;
-      lignevertical.push(indMoins1)
-      indMoins1 = indMoins1 - w;
-      bas = copyMasquedata.data[4 * indMoins1]
+    masquedata.data[4 * indMoins1] = 255;
+    masquedata.data[4 * indMoins1 + 1] = 255;
+    masquedata.data[4 * indMoins1 + 2] = 255;
+    masquedata.data[4 * indMoins1 + 3] = 255;
+    //ind = indMoins1;
+    lignevertical.push(indMoins1);
+    indMoins1 = indMoins1 - w;
+    bas = copyMasquedata.data[4 * indMoins1];
   }
 
   // ligne verticale haut
-  var ind = n
+  var ind = n;
   var indPlus1 = ind + w;
-  var haut = copyMasquedata.data[4 * indPlus1]
+  var haut = copyMasquedata.data[4 * indPlus1];
   while (gauche == 255 && indPlus1 != 0) {
-      masquedata.data[4 * indPlus1] = 255
-      masquedata.data[4 * indPlus1 + 1] = 255
-      masquedata.data[4 * indPlus1 + 2] = 255
-      masquedata.data[4 * indPlus1 + 3] = 255
-      //ind = indPlus1;
-      lignevertical.push(indPlus1)
-      indPlus1 = indPlus1 + w;
-      haut = copyMasquedata.data[4 * indPlus1]
+    masquedata.data[4 * indPlus1] = 255;
+    masquedata.data[4 * indPlus1 + 1] = 255;
+    masquedata.data[4 * indPlus1 + 2] = 255;
+    masquedata.data[4 * indPlus1 + 3] = 255;
+    //ind = indPlus1;
+    lignevertical.push(indPlus1);
+    indPlus1 = indPlus1 + w;
+    haut = copyMasquedata.data[4 * indPlus1];
   }
-
 
   /*
   // ligne vertical tamp
   var ligneverticaltemp = [];
   var lignehorizontaltemp = [];
   */
-  
+
   // recup pixels a partir de la ligne horizontale
   for (let k = 0; k < lignehorizontal.length; k++) {
-      ind = lignehorizontal[k];
-      indMoins1 = ind - w;
-      bas = copyMasquedata.data[4 * indMoins1]
-      while (bas == 255 && indMoins1 != 0) {
-          masquedata.data[4 * indMoins1] = 255
-          masquedata.data[4 * indMoins1 + 1] = 255
-          masquedata.data[4 * indMoins1 + 2] = 255
-          masquedata.data[4 * indMoins1 + 3] = 255
-          //ind = indMoins1;
-          //bastemp = indMoins1;
-          indMoins1 = indMoins1 - w;
-          bas = copyMasquedata.data[4 * indMoins1]
-      }
-      
-      //ligneverticaltemp.push(bastemp);
-      
-      ind = lignehorizontal[k]
-      indPlus1 = ind + w;
-      haut = copyMasquedata.data[4 * indPlus1]
-      while (haut == 255 && indPlus1 != 0) {
-          masquedata.data[4 * indPlus1] = 255
-          masquedata.data[4 * indPlus1 + 1] = 255
-          masquedata.data[4 * indPlus1 + 2] = 255
-          masquedata.data[4 * indPlus1 + 3] = 255
-          //ind = indPlus1;
-          //hauttemp = indPlus1;
-          indPlus1 = indPlus1 + w;
-          haut = copyMasquedata.data[4 * indPlus1]
-      }
+    ind = lignehorizontal[k];
+    indMoins1 = ind - w;
+    bas = copyMasquedata.data[4 * indMoins1];
+    while (bas == 255 && indMoins1 != 0) {
+      masquedata.data[4 * indMoins1] = 255;
+      masquedata.data[4 * indMoins1 + 1] = 255;
+      masquedata.data[4 * indMoins1 + 2] = 255;
+      masquedata.data[4 * indMoins1 + 3] = 255;
+      //ind = indMoins1;
+      //bastemp = indMoins1;
+      indMoins1 = indMoins1 - w;
+      bas = copyMasquedata.data[4 * indMoins1];
+    }
 
-      //ligneverticaltemp.push(hauttemp);
+    //ligneverticaltemp.push(bastemp);
 
+    ind = lignehorizontal[k];
+    indPlus1 = ind + w;
+    haut = copyMasquedata.data[4 * indPlus1];
+    while (haut == 255 && indPlus1 != 0) {
+      masquedata.data[4 * indPlus1] = 255;
+      masquedata.data[4 * indPlus1 + 1] = 255;
+      masquedata.data[4 * indPlus1 + 2] = 255;
+      masquedata.data[4 * indPlus1 + 3] = 255;
+      //ind = indPlus1;
+      //hauttemp = indPlus1;
+      indPlus1 = indPlus1 + w;
+      haut = copyMasquedata.data[4 * indPlus1];
+    }
+
+    //ligneverticaltemp.push(hauttemp);
   }
 
   // recup pixels a partir de la ligne verticale
   for (let k = 0; k < lignevertical.length; k++) {
-      ind = lignevertical[k]
-      gauche = copyMasquedata.data[4 * (ind - 1)]
-      while (gauche == 255 && ind - 1 != 0) {
-          masquedata.data[4 * (ind - 1)] = 255
-          masquedata.data[4 * (ind - 1) + 1] = 255
-          masquedata.data[4 * (ind - 1) + 2] = 255
-          masquedata.data[4 * (ind - 1) + 3] = 255
-          ind = ind - 1;
-          //gauchetemp = ind;
-          //lignehorizontal.push(ind)
-          gauche = copyMasquedata.data[4 * (ind - 1)]
-      }
+    ind = lignevertical[k];
+    gauche = copyMasquedata.data[4 * (ind - 1)];
+    while (gauche == 255 && ind - 1 != 0) {
+      masquedata.data[4 * (ind - 1)] = 255;
+      masquedata.data[4 * (ind - 1) + 1] = 255;
+      masquedata.data[4 * (ind - 1) + 2] = 255;
+      masquedata.data[4 * (ind - 1) + 3] = 255;
+      ind = ind - 1;
+      //gauchetemp = ind;
+      //lignehorizontal.push(ind)
+      gauche = copyMasquedata.data[4 * (ind - 1)];
+    }
 
-      //lignehorizontaltemp.push(gauchetemp);
+    //lignehorizontaltemp.push(gauchetemp);
 
-      ind = lignevertical[k];
-      droite = copyMasquedata.data[4 * (ind + 1)]
-      while (droite == 255 && ind + 1 != 0) {
-          masquedata.data[4 * (ind + 1)] = 255
-          masquedata.data[4 * (ind + 1) + 1] = 255
-          masquedata.data[4 * (ind + 1) + 2] = 255
-          masquedata.data[4 * (ind + 1) + 3] = 255
-          ind = ind + 1;
-          //droitetemp = ind;
-          //lignehorizontal.push(ind)
-          droite = copyMasquedata.data[4 * (ind + 1)]
-      }
+    ind = lignevertical[k];
+    droite = copyMasquedata.data[4 * (ind + 1)];
+    while (droite == 255 && ind + 1 != 0) {
+      masquedata.data[4 * (ind + 1)] = 255;
+      masquedata.data[4 * (ind + 1) + 1] = 255;
+      masquedata.data[4 * (ind + 1) + 2] = 255;
+      masquedata.data[4 * (ind + 1) + 3] = 255;
+      ind = ind + 1;
+      //droitetemp = ind;
+      //lignehorizontal.push(ind)
+      droite = copyMasquedata.data[4 * (ind + 1)];
+    }
 
-      //lignehorizontaltemp.push(droitetemp);
-
+    //lignehorizontaltemp.push(droitetemp);
   }
-/*
+  /*
   // et zeeeeest reparti horizontal 2e fois
   // recup pixels a partir de la ligne horizontale
   for (let k = 0; k < lignehorizontaltemp.length; k++) {
@@ -553,14 +611,21 @@ function recupPierre(masquedata, copyMasquedata, point, w, h) {
 
   }
 */
-  
-  return masquedata
 
+  return masquedata;
 }
 
-
-function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vrais, wtot, htot, repeatX, repeatY) {
-
+function createTextureCheminEvolue(
+  masquetext,
+  imgs,
+  chemin,
+  centres,
+  centres_vrais,
+  wtot,
+  htot,
+  repeatX,
+  repeatY
+) {
   const distancemaxPierre = 1000;
   const distancemax = 450;
   const distancemaxherbe = 350;
@@ -569,36 +634,36 @@ function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vr
   var w = masquetext.width;
   var h = masquetext.height;
 
-  var canvasmasque = document.createElement('canvas');
+  var canvasmasque = document.createElement("canvas");
   canvasmasque.width = w * repeatX;
   canvasmasque.height = h * repeatY;
 
-  var ctxmasque = canvasmasque.getContext('2d');
+  var ctxmasque = canvasmasque.getContext("2d");
   for (let i = 0; i < repeatX; i++) {
-      for (let j = 0; j < repeatY; j++) {
-          ctxmasque.drawImage(masquetext, 0, 0, w, h, w * i, j * h, w, h);
-      }
+    for (let j = 0; j < repeatY; j++) {
+      ctxmasque.drawImage(masquetext, 0, 0, w, h, w * i, j * h, w, h);
+    }
   }
 
   // canvas des pierres
-  var canvas = document.createElement('canvas');
+  var canvas = document.createElement("canvas");
   canvas.width = wtot * repeatX;
   canvas.height = htot * repeatY;
 
-  var ctx = canvas.getContext('2d');
+  var ctx = canvas.getContext("2d");
 
   var germes = [];
   var point;
   var point_vrai;
-  for (let i = 0; i < centres_vrais.length; i++) {
-      point_vrai = centres_vrais[i];
-      point = centres[i];
-      
-      //var r1 = Math.random();
-      //var r2 = Math.random();
-      
-      if (distancechemin(point_vrai, chemin) < distancemax) {
-        germes.push(point);
+  for (let i = 0; i < centres.length; i++) {
+    point_vrai = centres[i];
+    point = centres[i];
+
+    //var r1 = Math.random();
+    //var r2 = Math.random();
+
+    if (distancechemin(point_vrai, chemin) < distancemax) {
+      germes.push(point);
     }
   }
 
@@ -610,17 +675,13 @@ function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vr
   var image;
   for (let k = 0; k < germes.length; k++) {
     numeroPierre = germes[k][2] % nbPierres;
-      image = imgs[numeroPierre];
-      imw = image.width;
-      imh = image.height;
-      x = germes[k][0];
-      y = germes[k][1];
-      ctx.drawImage(image, 0,0, imw,imh, y, x, imw, imh);
-
-    
-
+    image = imgs[numeroPierre];
+    imw = image.width;
+    imh = image.height;
+    x = germes[k][0];
+    y = germes[k][1];
+    ctx.drawImage(image, 0, 0, imw, imh, y, x, imw, imh);
   }
-
 
   /*
   
@@ -633,19 +694,10 @@ function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vr
 
   ctxnoir.putImageData(noirdata, 0, 0);*/
 
-  return [canvasmasque, canvas]
-
+  return [canvasmasque, canvas];
 }
 
-function recupPierreImage(canvas, img, point, w, h) {
-
-
-
-}
-
-
-
-
+function recupPierreImage(canvas, img, point, w, h) {}
 
 // Fonction pour définir une texture
 function defineTexture(src, repeatX, repeatY, repeatWrapping = false) {
@@ -663,34 +715,32 @@ function defineTexture(src, repeatX, repeatY, repeatWrapping = false) {
 }
 
 function defineTextureCanvas(src, repeatX, repeatY, repeatWrapping = false) {
-
-  var textu = new THREE.CanvasTexture(src)
+  var textu = new THREE.CanvasTexture(src);
   if (repeatWrapping) {
-      textu.wrapS = THREE.RepeatWrapping;
-      textu.wrapT = THREE.RepeatWrapping;
-      textu.repeat.set(repeatX, repeatY)
+    textu.wrapS = THREE.RepeatWrapping;
+    textu.wrapT = THREE.RepeatWrapping;
+    textu.repeat.set(repeatX, repeatY);
   } else {
-      textu.wrapS = THREE.ClampToEdgeWrapping
-      textu.wrapT = THREE.ClampToEdgeWrapping
+    textu.wrapS = THREE.ClampToEdgeWrapping;
+    textu.wrapT = THREE.ClampToEdgeWrapping;
   }
 
-  return textu
-
+  return textu;
 }
 
 // Fonction pour définir un maillage de plan
 function definePlane(mater, x, y, z, w, h, faces = 1) {
+  var meshPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h, faces, faces),
+    mater
+  );
 
-  var meshPlane = new THREE.Mesh(new THREE.PlaneGeometry(w, h, faces, faces),mater);
+  meshPlane.rotation.x += (-1 * Math.PI) / 2;
+  meshPlane.position.x = x;
+  meshPlane.position.y = y;
+  meshPlane.position.z = z;
 
-  
-  meshPlane.rotation.x += -1 * Math.PI / 2
-  meshPlane.position.x = x
-  meshPlane.position.y = y
-  meshPlane.position.z = z
-
-  return meshPlane
-
+  return meshPlane;
 }
 
 function mintibo(T) {
@@ -712,7 +762,6 @@ function maxtibo(T) {
   }
   return mini;
 }
-
 
 function buildParametrisationTchebytcheff(nbElem, pas) {
   var T = [];
@@ -747,8 +796,6 @@ function lagrange(x, X, Y) {
   }
   return Somme;
 }
-
-
 
 function computeCheminInterpol(Points) {
   var X = [];
@@ -810,12 +857,11 @@ function transformCanvastoThreeCoordonates(x, z) {
 }
 
 function transformThreeCoordonatestoCanvas(x, z) {
-  var newx = (z + 5) * 512
+  var newx = (z + 5) * 512;
   var newz = (x + 5) * 512;
   var coordonnees = [newx, newz];
   return coordonnees;
 }
-
 
 ///////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -823,53 +869,74 @@ function transformThreeCoordonatestoCanvas(x, z) {
 ////////////////////////////////////////////////////////////////////
 
 function init_textures(imgs) {
-
   ///////////// HERBE /////////////
   var materialFond;
 
   if (textureHerbeBasique) {
-
-    const texture = defineTexture(imgs[0].src,10,10,true);
-    materialFond = new THREE.MeshBasicMaterial({map: texture,side: THREE.DoubleSide});
+    const texture = defineTexture(imgs[0].src, 10, 10, true);
+    materialFond = new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+    });
   } else {
-
-    var canvasherbe = createTextureHerbe([imgs[2],imgs[3]],imgs[1],10, 10);
+    var canvasherbe = createTextureHerbe([imgs[2], imgs[3]], imgs[1], 10, 10);
     var texture = defineTextureCanvas(canvasherbe, 0, 0, false);
     texture.minFilter = THREE.LinearFilter;
 
-    materialFond = new THREE.MeshBasicMaterial({map: texture,side: THREE.DoubleSide});
+    materialFond = new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+    });
   }
-
 
   /////////// CHEMIN /////////
 
   var materialChemin;
 
   if (textureCheminBasique) {
-
     var chemin = computeCheminInterpol(Points);
     var centres = dupliquer(tableauCentres[numeroTexture], 10, 10, 512, 512);
-  
-    var tabresult = createTextureCheminBasique(imgs[4],imgs[5], chemin, centres, 10, 10);
+
+    var tabresult = createTextureCheminBasique(
+      imgs[4],
+      imgs[5],
+      chemin,
+      centres,
+      10,
+      10
+    );
     var canvascheminMasque = tabresult[0];
     var canvaschemin = tabresult[1];
-
 
     const textureChemin = defineTextureCanvas(canvaschemin, 0, 0, false);
     textureChemin.minFilter = THREE.LinearFilter;
 
-    const textureCheminMasque = defineTextureCanvas(canvascheminMasque, 0, 0, false);
+    const textureCheminMasque = defineTextureCanvas(
+      canvascheminMasque,
+      0,
+      0,
+      false
+    );
     textureCheminMasque.minFilter = THREE.LinearFilter;
-    
-    materialChemin = new THREE.MeshBasicMaterial({alphaMap : textureCheminMasque, alphaTest : 0.5, map: textureChemin,  side: THREE.DoubleSide});
 
+    materialChemin = new THREE.MeshBasicMaterial({
+      alphaMap: textureCheminMasque,
+      alphaTest: 0.5,
+      map: textureChemin,
+      side: THREE.DoubleSide,
+    });
   } else {
-
     var chemin = computeCheminInterpol(Points);
     var centres = dupliquer(tableauCentresBis[numeroTexture], 10, 10, 512, 512);
-    var centres_vrais = dupliquer(tableauCentresBis_vrais[numeroTexture], 10, 10, 512, 512);
+    var centres_vrais = dupliquer(
+      tableauCentresBis_vrais[numeroTexture],
+      10,
+      10,
+      512,
+      512
+    );
 
-    var images = imgs.splice(6, nbPierres,);
+    var images = imgs.splice(6, nbPierres);
 
     /*
     var centres = [];
@@ -891,30 +958,51 @@ function init_textures(imgs) {
     console.log(centres)
     console.log(images.length)*/
 
-    var tabresult = createTextureCheminEvolue(imgs[5], images, chemin, centres, centres_vrais, 512, 512, 10, 10);
+    var tabresult = createTextureCheminEvolue(
+      imgs[5],
+      images,
+      chemin,
+      centres,
+      centres_vrais,
+      512,
+      512,
+      10,
+      10
+    );
     var canvascheminMasque = tabresult[0];
     var canvaschemin = tabresult[1];
-
 
     const textureChemin = defineTextureCanvas(canvaschemin, 0, 0, false);
     textureChemin.minFilter = THREE.LinearFilter;
 
-    const textureCheminMasque = defineTextureCanvas(canvascheminMasque, 0, 0, false);
+    const textureCheminMasque = defineTextureCanvas(
+      canvascheminMasque,
+      0,
+      0,
+      false
+    );
     textureCheminMasque.minFilter = THREE.LinearFilter;
-    
-    materialChemin = new THREE.MeshBasicMaterial({alphaMap : textureCheminMasque, alphaTest : 0.5, map: textureChemin,  side: THREE.DoubleSide});
+
+    materialChemin = new THREE.MeshBasicMaterial({
+      alphaMap: textureCheminMasque,
+      alphaTest: 0.5,
+      map: textureChemin,
+      side: THREE.DoubleSide,
+    });
   }
-  
 
-  return Promise.resolve([materialFond, materialChemin])
-  
+  return Promise.resolve([materialFond, materialChemin]);
 }
-
 
 // Fonction d'initialisation principale
 function init(textures) {
-
-  document.addEventListener("contextmenu",function (event) {event.preventDefault();},false);
+  document.addEventListener(
+    "contextmenu",
+    function (event) {
+      event.preventDefault();
+    },
+    false
+  );
 
   // Déplacement dans la scène avec Z Q S D
   document.addEventListener("keydown", function (event) {
@@ -963,13 +1051,12 @@ function init(textures) {
     }
   });
 
-
   var mapW = 10;
   var mapH = 10;
 
   // Ajout d'une source de lumière
-  const luminosite = 1  // entre 0 et 1
-  const ambiantLight = new THREE.AmbientLight(0xcccccc, luminosite)
+  const luminosite = 1; // entre 0 et 1
+  const ambiantLight = new THREE.AmbientLight(0xcccccc, luminosite);
   scene.add(ambiantLight);
 
   // Ajout des contrôles à la souris
@@ -1012,11 +1099,9 @@ function init(textures) {
   if (randomizeElevation) {
     randomize_elevation(0.4, 0, epsilon);
   }
-
 }
 
 function animate() {
-
   requestAnimationFrame(animate);
   controls.update();
   renderer.render(scene, camera);
@@ -1038,7 +1123,6 @@ function animate() {
   } else if (state.mouvementcube.gauche) {
     cube.position.z -= 0.03;
   } else if (state.space) {
-
     var xenter = cube.position.x;
     var zenter = cube.position.z;
     var coordonnespoint = transformThreeCoordonatestoCanvas(xenter, zenter);
@@ -1055,9 +1139,7 @@ function animate() {
     compteur = compteur + 1;
 
     state.space = false;
-
   } else if (state.selectionPoints) {
-
     for (let i = 0; i < compteur; i++) {
       var selectedObject = scene.getObjectByName("cube" + i);
       scene.remove(selectedObject);
@@ -1079,34 +1161,29 @@ function animate() {
     Points = [];
     cubes = [];
     compteur = 0;
-  
   } else if (state.rendre) {
-
-  var selectedObject = scene.getObjectByName("pelouse");
+    var selectedObject = scene.getObjectByName("pelouse");
     scene.remove(selectedObject);
 
-  Promise.all(promis).then((imgs) => {
-    init_textures(imgs).then((textures) => {
-      init(textures);
+    Promise.all(promis).then((imgs) => {
+      init_textures(imgs).then((textures) => {
+        init(textures);
+      });
     });
-  });
 
     state.rendre = false;
-
   }
 }
 
 // Assigner des élévations aléatoires aux vertices des maillages plans
 function randomize_elevation(value = 0.4, offset = 0, epsilon) {
-
   for (let i = 0; i < meshFloor.geometry.vertices.length; i++) {
-      let random_value = Math.random()
-      meshFloor.geometry.vertices[i].z = random_value * value + offset + epsilon
-      meshGrass.geometry.vertices[i].z = random_value * value + offset
+    let random_value = Math.random();
+    meshFloor.geometry.vertices[i].z = random_value * value + offset + epsilon;
+    meshGrass.geometry.vertices[i].z = random_value * value + offset;
   }
-  meshFloor.geometry.verticesNeedUpdate = true
-  meshGrass.geometry.verticesNeedUpdate = true
-
+  meshFloor.geometry.verticesNeedUpdate = true;
+  meshGrass.geometry.verticesNeedUpdate = true;
 }
 
 /*
