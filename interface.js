@@ -29,9 +29,11 @@ const centresTexture8bis = await (
 ).json();
 tableauCentresBis[8] = centresTexture8bis;
 
-const centresTexture10bis = await (
-  await fetch("./centresTexture10bis.json")
-).json();
+const centresTexture3bis = await (await fetch("./centresTexture3bis.json")).json();
+tableauCentresBis[3] = centresTexture3bis;
+
+
+const centresTexture10bis = await (await fetch("./centresTexture10bis.json")).json();
 tableauCentresBis[10] = centresTexture10bis;
 const centresTexture10bis_vrais = await (
   await fetch("./centresTexture10bis_vrais.json")
@@ -123,6 +125,8 @@ for (let i = 1; i <= nbPierres; i++) {
     loadImg("graphics/Texture" + numeroTexture + "/Pierre" + i + ".png")
   );
 }
+
+console.log(nbPierres)
 
 Promise.all(promis).then((imgs) => {
   init_textures(imgs).then((textures) => {
