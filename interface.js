@@ -1,6 +1,6 @@
-var tableauCentres = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-var tableauCentresBis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-var tableauCentresBis_vrais = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var tableauCentres = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var tableauCentresBis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var tableauCentresBis_vrais = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 const centresTexture3 = await (await fetch("./centresTexture3.json")).json();
 tableauCentres[3] = centresTexture3;
@@ -21,16 +21,13 @@ tableauCentres[12] = centresTexture12;
 
 
 
-const centresTexture3bis = await (await fetch("./centresTexture3bis.json")).json();
-tableauCentresBis[3] = centresTexture3bis;
-
-
-const centresTexture10bis = await (await fetch("./centresTexture10bis.json")).json();
-tableauCentresBis[10] = centresTexture10bis;
-const centresTexture10bis_vrais = await (
-  await fetch("./centresTexture10bis_vrais.json")
-).json();
+const centresTexture3bis_vrais = await (await fetch("./centresTexture3bis_vrais.json")).json();
+tableauCentresBis_vrais[3] = centresTexture3bis_vrais;
+const centresTexture8bis_vrais = await (await fetch("./centresTexture8bis_vrais.json")).json();
+tableauCentresBis_vrais[8] = centresTexture8bis_vrais;
+const centresTexture10bis_vrais = await (await fetch("./centresTexture10bis_vrais.json")).json();
 tableauCentresBis_vrais[10] = centresTexture10bis_vrais;
+
 const centresTexture11bis = await (
   await fetch("./centresTexture11bis.json")
 ).json();
@@ -43,7 +40,7 @@ const decalageHerbe = true;
 const numeroTexture = 10;
 const randomizeElevation = false;
 
-const nbPierres = tableauCentresBis[numeroTexture].length;
+const nbPierres = tableauCentresBis_vrais[numeroTexture].length;
 
 const scene = new THREE.Scene();
 
@@ -948,8 +945,8 @@ function init_textures(imgs) {
       console.log(im)
       var w = im.width;
       var h = im.height;
-      var centrex = centresTexture10bis[i][1] + w / 2;
-      var centrey = centresTexture10bis[i][0] + h/ 2;
+      var centrey = centresTexture3bis[i][1] + w / 2;
+      var centrex = centresTexture3bis[i][0] + h/ 2;
       if (centrex > 512) {
         centrex = centrex - 512;
       }
