@@ -234,7 +234,7 @@ function estPresent(pc, pierres) {
 
 function trouverPierrePlusProche(point, pierres, centres) {
   var min = 100000000000000;
-  var pointleplusproche = [0, 0];
+  var pointleplusproche = [0, 0, 0];
   for (let i = 0; i < centres.length; i++) {
     var pc = centres[i];
     var distance = Math.sqrt(
@@ -592,12 +592,32 @@ function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vr
       point_vrai = centres_vrais[i];
       point = centres[i];
       
-      //var r1 = Math.random();
-      //var r2 = Math.random();
-      
-      if (distancechemin(point_vrai, chemin) < distancemax) {
+      var r1 = Math.random();
+      var r2 = Math.random();
+
+      if (distancechemin(point_vrai, chemin) < distancemaxherbe) {
         germes.push(point_vrai);
-    }
+      }
+      else if (
+        distancechemin(point_vrai, chemin) > distancemaxherbe &&
+        distancechemin(point_vrai, chemin) < distancemax
+      )
+      {
+        if (r1 < 0.3) [germes.push(point_vrai)];
+      }
+      else if (
+        distancechemin(point_vrai, chemin) > distancemax &&
+        distancechemin(point_vrai, chemin) < distancemaxPierre
+      )
+      {
+        if (r2 < 0.01) {
+          var nbPierresTas = Math.random() * 10;
+          var Pierres = tasdepierre(point_vrai, nbPierresTas, centres_vrais);
+          for (let l = 0; l < Pierres.length; l++) {
+            germes.push(Pierres[l]);
+          }
+        }
+      }
   }
 
   var numeroPierre;
@@ -608,15 +628,15 @@ function createTextureCheminEvolue(masquetext, imgs, chemin, centres, centres_vr
   var image;
   for (let k = 0; k < germes.length; k++) {
     numeroPierre = germes[k][2] % nbPierres;
-      image = imgs[numeroPierre];
-      imw = image.width;
-      imh = image.height;
-      x = germes[k][0] - imh/2;
-      y = germes[k][1] - imw/2;
-      
-      if (x > 0 & y > 0) {
-        ctx.drawImage(image, 0,0, imw,imh, y, x, imw, imh);
-      }
+    image = imgs[numeroPierre];
+    imw = image.width;
+    imh = image.height;
+    x = germes[k][0] - imh/2;
+    y = germes[k][1] - imw/2;
+    
+    if (x > 0 & y > 0) {
+      ctx.drawImage(image, 0,0, imw,imh, y, x, imw, imh);
+    }
 
   }
 
@@ -1071,7 +1091,7 @@ function animate() {
   } else if (state.rendre) {
 
   var selectedObject = scene.getObjectByName("pelouse");
-    scene.remove(selectedObject);
+  scene.remove(selectedObject);
 
   Promise.all(promis).then((imgs) => {
     init_textures(imgs).then((textures) => {
