@@ -1,7 +1,7 @@
-close all
-clear all
+close all;
+clear;
 
-nom = "freeTexture6";
+nom = "freeTexture11";
 
 I = imread('./../graphics/masque_' + nom + '.png');
 Itex = imread('./../graphics/' + nom' + ".png");
@@ -76,6 +76,14 @@ if ((x > (nblignes/2) && x <= (3/2 * nblignes) && y>(nbcols/2) && y<= (3/2*nbcol
     imwrite(Irec, nom  + '/Pierre'+ compteur +'.png','Alpha',Arec);
     compteur = compteur +1;
     
+    yPierre = round(yPierre);
+    xPierre = round(xPierre);
+    if yPierre == 0
+        yPierre = 1;
+    end
+    if xPierre == 0
+        xPierre = 1;
+    end
     I(xPierre:xPierre+2,yPierre:yPierre+2,1) = 255;
     I(xPierre:xPierre+2,yPierre:yPierre+2,2) = 0;
     I(xPierre:xPierre+2,yPierre:yPierre+2,3) = 0;
