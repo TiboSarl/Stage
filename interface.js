@@ -1,5 +1,4 @@
 var tableauCentres = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-var tableauCentresBis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var tableauCentresBis_vrais = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 const centresTexture3 = await (await fetch("./centresTexture3.json")).json();
@@ -42,7 +41,7 @@ tableauCentresBis_vrais[12] = centresTexture12bis_vrais;
 const textureHerbeBasique = false;
 const textureCheminBasique = false;
 const decalageHerbe = true;
-const numeroTexture = 5;
+const numeroTexture = 10;
 const randomizeElevation = false;
 
 const nbPierres = tableauCentresBis_vrais[numeroTexture].length;
@@ -611,17 +610,7 @@ function recupPierre(masquedata, copyMasquedata, point, w, h) {
   return masquedata;
 }
 
-function createTextureCheminEvolue(
-  masquetext,
-  imgs,
-  chemin,
-  centres,
-  centres_vrais,
-  wtot,
-  htot,
-  repeatX,
-  repeatY
-) {
+function createTextureCheminEvolue(masquetext,imgs, chemin, centres, wtot, htot, repeatX, repeatY) {
   const distancemaxPierre = 1000;
   const distancemax = 450;
   const distancemaxherbe = 350;
@@ -651,27 +640,26 @@ function createTextureCheminEvolue(
   var germes = [];
   var point;
   var point_vrai;
-  for (let i = 0; i < centres_vrais.length; i++) {
-    point_vrai = centres_vrais[i];
+  for (let i = 0; i < centres.length; i++) {
     point = centres[i];
 
     var r1 = Math.random();
     var r2 = Math.random();
 
-    if (distancechemin(point_vrai, chemin) < distancemaxherbe) {
-      germes.push(point_vrai);
+    if (distancechemin(point, chemin) < distancemaxherbe) {
+      germes.push(point);
     } else if (
-      distancechemin(point_vrai, chemin) > distancemaxherbe &&
-      distancechemin(point_vrai, chemin) < distancemax
+      distancechemin(point, chemin) > distancemaxherbe &&
+      distancechemin(point, chemin) < distancemax
     ) {
-      if (r1 < 0.3) [germes.push(point_vrai)];
+      if (r1 < 0.3) [germes.push(point)];
     } else if (
-      distancechemin(point_vrai, chemin) > distancemax &&
-      distancechemin(point_vrai, chemin) < distancemaxPierre
+      distancechemin(point, chemin) > distancemax &&
+      distancechemin(point, chemin) < distancemaxPierre
     ) {
       if (r2 < 0.01) {
         var nbPierresTas = Math.random() * 10;
-        var Pierres = tasdepierre(point_vrai, nbPierresTas, centres_vrais);
+        var Pierres = tasdepierre(point, nbPierresTas, centres);
         for (let l = 0; l < Pierres.length; l++) {
           germes.push(Pierres[l]);
         }
@@ -932,48 +920,11 @@ function init_textures(imgs) {
     });
   } else {
     var chemin = computeCheminInterpol(Points);
-    var centres = dupliquer(tableauCentresBis[numeroTexture], 10, 10, 512, 512);
-    var centres_vrais = dupliquer(
-      tableauCentresBis_vrais[numeroTexture],
-      10,
-      10,
-      512,
-      512
-    );
+    var centres = dupliquer(tableauCentresBis_vrais[numeroTexture], 10, 10, 512, 512);
 
     var images = imgs.splice(6, nbPierres);
 
-    /*
-    var centres = [];
-    for (let i=0; i<images.length; i++) {
-      var im = images[i];
-      console.log(im)
-      var w = im.width;
-      var h = im.height;
-      var centrey = centresTexture3bis[i][1] + w / 2;
-      var centrex = centresTexture3bis[i][0] + h/ 2;
-      if (centrex > 512) {
-        centrex = centrex - 512;
-      }
-      if (centrey > 512) {
-        centrey = centrey - 512;
-      }
-      centres.push([centrex, centrey]);
-    }
-    console.log(centres)
-    console.log(images.length)*/
-
-    var tabresult = createTextureCheminEvolue(
-      imgs[5],
-      images,
-      chemin,
-      centres,
-      centres_vrais,
-      512,
-      512,
-      10,
-      10
-    );
+    var tabresult = createTextureCheminEvolue(imgs[5], images, chemin, centres, 512, 512, 10, 10);
     var canvascheminMasque = tabresult[0];
     var canvaschemin = tabresult[1];
 
