@@ -33,6 +33,8 @@ const centresTexture8bis_vrais = await (await fetch("./centresTexture8bis_vrais.
 tableauCentresBis_vrais[8] = centresTexture8bis_vrais;
 const centresTexture10bis_vrais = await (await fetch("./centresTexture10bis_vrais.json")).json();
 tableauCentresBis_vrais[10] = centresTexture10bis_vrais;
+const centresTexture11bis_vrais = await (await fetch("./centresTexture11bis_vrais.json")).json();
+tableauCentresBis_vrais[11] = centresTexture11bis_vrais;
 const centresTexture12bis_vrais = await (await fetch("./centresTexture12bis_vrais.json")).json();
 tableauCentresBis_vrais[12] = centresTexture12bis_vrais;
 
@@ -40,7 +42,7 @@ tableauCentresBis_vrais[12] = centresTexture12bis_vrais;
 const textureHerbeBasique = false;
 const textureCheminBasique = false;
 const decalageHerbe = true;
-const numeroTexture = 12;
+const numeroTexture = 5;
 const randomizeElevation = false;
 
 const nbPierres = tableauCentresBis_vrais[numeroTexture].length;
