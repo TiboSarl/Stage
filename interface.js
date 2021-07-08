@@ -36,7 +36,7 @@ tableauCentresBis_vrais[10] = centresTexture10bis_vrais;
 const textureHerbeBasique = false;
 const textureCheminBasique = false;
 const decalageHerbe = true;
-const numeroTexture = 6;
+const numeroTexture = 8;
 const randomizeElevation = false;
 
 const nbPierres = tableauCentresBis_vrais[numeroTexture].length;
