@@ -1,12 +1,11 @@
 close all
 clear all
 
-nom = "freeTexture3";
+nom = "freeTexture6";
 
-I = imread('masque_' + nom + '.png');
-Itex = imread(nom + ".png");
+I = imread('./../graphics/masque_' + nom + '.png');
+Itex = imread('./../graphics/' + nom' + ".png");
 
-I = imread("masque_" + nom + ".png");
 [nblignes,nbcols,nbcan] = size(Itex);
 Itexaug = zeros(2*nblignes,2*nbcols,nbcan);
 
@@ -35,8 +34,6 @@ imshow(Iaug);
 Itexaug = double(Itexaug);
 Iaug = double(Iaug);
 
-% Itexaug = Itex;
-% Iaug = I;
 [nblignesaug, nbcolsaug,nbcan] = size(Itexaug);
 CC = bwconncomp(Iaug);
 list = CC.PixelIdxList;
@@ -65,22 +62,33 @@ A =  double(Pierre(:,:,1) ==255);
 x = coinhautgauche(1);
 y = coinhautgauche(2);
 
-if ((x > (nblignes/2) && x < (3/2 * nblignes) && y>(nbcols/2) && y< (3/2*nbcols)))
+if ((x > (nblignes/2) && x <= (3/2 * nblignes) && y>(nbcols/2) && y<= (3/2*nbcols)))
     if(~premier)
         fprintf(fid, ',');
     end
-    fprintf(fid,'[%i', x-round(nblignes/2));
+    [lignesPierre,colonnesPierre, canauxPierre] = size(Irec);
+    xPierre = mod(mod(x,512) + lignesPierre/2, 512);
+    yPierre = mod(mod(y, 512) + colonnesPierre/2, 512);
+    fprintf(fid,'[%f', xPierre);
     fprintf(fid,',');
-    fprintf(fid,'%i ]',y-round(nbcols/2));
+    fprintf(fid,'%f]', yPierre);
     premier = false;
     imwrite(Irec, nom  + '/Pierre'+ compteur +'.png','Alpha',Arec);
     compteur = compteur +1;
+    
+    I(xPierre:xPierre+2,yPierre:yPierre+2,1) = 255;
+    I(xPierre:xPierre+2,yPierre:yPierre+2,2) = 0;
+    I(xPierre:xPierre+2,yPierre:yPierre+2,3) = 0;
 end
 
 
 
 
 end
+
+figure;
+imshow(I);
+
 fprintf(fid,']');
 fclose(fid);
 
