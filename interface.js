@@ -41,8 +41,9 @@ tableauCentresBis_vrais[12] = centresTexture12bis_vrais;
 const textureHerbeBasique = false;
 const textureCheminBasique = false;
 const decalageHerbe = true;
-const numeroTexture = 10;
+const numeroTexture = 6;
 const randomizeElevation = false;
+const NoisePerlin = false;
 
 const nbPierres = tableauCentresBis_vrais[numeroTexture].length;
 
@@ -865,21 +866,35 @@ function init_textures(imgs) {
   ///////////// HERBE /////////////
   var materialFond;
 
-  if (textureHerbeBasique) {
-    const texture = defineTexture(imgs[0].src, 10, 10, true);
-    materialFond = new THREE.MeshBasicMaterial({
-      map: texture,
-      side: THREE.DoubleSide,
-    });
-  } else {
-    var canvasherbe = createTextureHerbe([imgs[2], imgs[3]], imgs[1], 10, 10);
+
+  if (NoisePerlin) {
+
+    var canvasherbe = perlin_noise(0.01);
     var texture = defineTextureCanvas(canvasherbe, 0, 0, false);
     texture.minFilter = THREE.LinearFilter;
-
     materialFond = new THREE.MeshBasicMaterial({
       map: texture,
       side: THREE.DoubleSide,
     });
+
+
+  } else {
+    if (textureHerbeBasique) {
+      const texture = defineTexture(imgs[0].src, 10, 10, true);
+      materialFond = new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+      });
+    } else {
+      var canvasherbe = createTextureHerbe([imgs[2], imgs[3]], imgs[1], 10, 10);
+      var texture = defineTextureCanvas(canvasherbe, 0, 0, false);
+      texture.minFilter = THREE.LinearFilter;
+  
+      materialFond = new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+      });
+    }
   }
 
   /////////// CHEMIN /////////
@@ -1007,8 +1022,8 @@ function init(textures) {
     }
   });
 
-  var mapW = 10;
-  var mapH = 10;
+  var mapW = 100;
+  var mapH = 100;
 
   // Ajout d'une source de lumière
   const luminosite = 1; // entre 0 et 1
@@ -1025,11 +1040,11 @@ function init(textures) {
   // Creation de deux plans
   const epsilon = 0.001;
 
-  meshGrass = definePlane(textures[0], 0, 0, 0, mapW, mapH, 10, 10);
+  meshGrass = definePlane(textures[0], 0, 0, 0, mapW, mapH, 100, 100);
   meshGrass.name = "pelouse";
   scene.add(meshGrass);
 
-  meshFloor = definePlane(textures[1], 0, epsilon, 0, mapW, mapH, 10, 10);
+  meshFloor = definePlane(textures[1], 0, epsilon, 0, mapW, mapH, 100, 100);
   meshFloor.name = "floor";
   scene.add(meshFloor);
 
@@ -1055,6 +1070,8 @@ function init(textures) {
   if (randomizeElevation) {
     randomize_elevation(0.4, 0, epsilon);
   }
+
+  perlin_noise_mesh(33.3, epsilon);
 }
 
 function animate() {
@@ -1140,6 +1157,80 @@ function randomize_elevation(value = 0.4, offset = 0, epsilon) {
   }
   meshFloor.geometry.verticesNeedUpdate = true;
   meshGrass.geometry.verticesNeedUpdate = true;
+}
+
+
+
+function perlin_noise_mesh(scale, epsilon) {
+
+  const GRID_SIZE = 10;
+  const RESOLUTION = 128;
+  const COLOR_SCALE = 250;
+  
+  let num_pixels = GRID_SIZE / RESOLUTION;
+
+  let vertices = meshFloor.geometry.vertices.length;
+  let coteVertices = Math.sqrt(vertices);
+
+
+  for (let y = 0; y < coteVertices; y++){
+    for (let x = 0; x < coteVertices; x++){
+
+      let sampleX = x/ scale;
+      let sampleY = y/ scale;
+
+      let v = perlin.get(sampleX, sampleY)*20;
+
+
+      meshFloor.geometry.vertices[y*coteVertices + x].z = v + epsilon;
+      meshGrass.geometry.vertices[y*coteVertices + x].z = v;
+
+    }
+  }
+}
+function perlin_noise(scale) {
+
+  // Create a Canvas element
+  var canvasherbe = document.createElement("canvas");
+
+  // Draw image onto the canvas
+  var ctx = canvasherbe.getContext("2d");
+
+  //var w = 256;
+  //var h = 256;
+
+  // Size the canvas to the element
+  canvasherbe.width = 512;
+  canvasherbe.height = 512;
+  //let vertices = meshFloor.geometry.vertices.length;
+  //let coteVertices = Math.sqrt(vertices);
+  //console.log(coteVertices)
+
+  const GRID_SIZE = 4;
+  const RESOLUTION = 128;
+  const COLOR_SCALE = 250;
+  
+  let pixel_size = canvasherbe.width / RESOLUTION;
+  let num_pixels = GRID_SIZE / RESOLUTION;
+  
+  for (let y = 0; y < GRID_SIZE; y += num_pixels / GRID_SIZE){
+      for (let x = 0; x < GRID_SIZE; x += num_pixels / GRID_SIZE){
+          let v = parseInt(perlin.get(x, y) * COLOR_SCALE);
+          ctx.fillStyle = 'hsl('+v+',50%,50%)';
+          ctx.fillRect(
+              x / GRID_SIZE * canvasherbe.width,
+              y / GRID_SIZE * canvasherbe.width,
+              pixel_size,
+              pixel_size
+          );
+      }
+  }
+
+    //meshFloor.geometry.vertices[x*coteVertices + y].z = v + epsilon;
+    //meshGrass.geometry.vertices[x*coteVertices + y].z = v;
+      
+  return canvasherbe
+  
 }
 
 /*
