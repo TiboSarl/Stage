@@ -19,13 +19,14 @@ tableauCentres[11] = centresTexture11;
 const centresTexture12 = await (await fetch("./centresTexture12.json")).json();
 tableauCentres[12] = centresTexture12;
 
-
-
-const centresTexture3bis = await (await fetch("./centresTexture3bis.json")).json();
+const centresTexture3bis = await (
+  await fetch("./centresTexture3bis.json")
+).json();
 tableauCentresBis[3] = centresTexture3bis;
 
-
-const centresTexture10bis = await (await fetch("./centresTexture10bis.json")).json();
+const centresTexture10bis = await (
+  await fetch("./centresTexture10bis.json")
+).json();
 tableauCentresBis[10] = centresTexture10bis;
 const centresTexture10bis_vrais = await (
   await fetch("./centresTexture10bis_vrais.json")
@@ -118,7 +119,7 @@ for (let i = 1; i <= nbPierres; i++) {
   );
 }
 
-console.log(nbPierres)
+console.log(nbPierres);
 
 Promise.all(promis).then((imgs) => {
   init_textures(imgs).then((textures) => {
@@ -860,10 +861,49 @@ function transformCanvastoThreeCoordonates(x, z) {
 }
 
 function transformThreeCoordonatestoCanvas(x, z) {
-  var newx = (z + 5) * 512;
-  var newz = (x + 5) * 512;
+  var newx = (z + 50) * 5120;
+  var newz = (x + 50) * 5120;
   var coordonnees = [newx, newz];
   return coordonnees;
+}
+
+function perlin_noise_mesh(scale, epsilon, octaves, lacunarity, persistence) {
+  const GRID_SIZE = 10;
+  const RESOLUTION = 128;
+  const COLOR_SCALE = 250;
+  const heightElevation = 20;
+  let num_pixels = GRID_SIZE / RESOLUTION;
+
+  let vertices = meshFloor.geometry.vertices.length;
+  let coteVertices = Math.sqrt(vertices);
+
+  var chemin = computeCheminInterpol(Points);
+
+  for (let y = 0; y < coteVertices; y++) {
+    for (let x = 0; x < coteVertices; x++) {
+      let hauteur = 0;
+      let amplitude = 1;
+      let frequence = 1;
+      for (let o = 0; o < octaves; o++) {
+        let sampleX = (x / scale) * frequence;
+        let sampleY = (y / scale) * frequence;
+
+        let v = perlin.get(sampleX, sampleY);
+
+        hauteur = hauteur + v * amplitude;
+        amplitude = amplitude * persistence;
+        frequence = frequence * lacunarity;
+      }
+      let newcoord = [(x * 5120) / 101, (y * 5120) / 101];
+
+      let distance = distancechemin(newcoord, chemin);
+      console.log(distance);
+
+      hauteur = hauteur * heightElevation;
+      meshFloor.geometry.vertices[y * coteVertices + x].z = hauteur + epsilon;
+      meshGrass.geometry.vertices[y * coteVertices + x].z = hauteur;
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1054,8 +1094,8 @@ function init(textures) {
     }
   });
 
-  var mapW = 10;
-  var mapH = 10;
+  var mapW = 100;
+  var mapH = 100;
 
   // Ajout d'une source de lumière
   const luminosite = 1; // entre 0 et 1
@@ -1072,11 +1112,11 @@ function init(textures) {
   // Creation de deux plans
   const epsilon = 0.001;
 
-  meshGrass = definePlane(textures[0], 0, 0, 0, mapW, mapH, 10, 10);
+  meshGrass = definePlane(textures[0], 0, 0, 0, mapW, mapH, 100, 100);
   meshGrass.name = "pelouse";
   scene.add(meshGrass);
 
-  meshFloor = definePlane(textures[1], 0, epsilon, 0, mapW, mapH, 10, 10);
+  meshFloor = definePlane(textures[1], 0, epsilon, 0, mapW, mapH, 100, 100);
   meshFloor.name = "floor";
   scene.add(meshFloor);
 
@@ -1102,6 +1142,8 @@ function init(textures) {
   if (randomizeElevation) {
     randomize_elevation(0.4, 0, epsilon);
   }
+
+  perlin_noise_mesh(33.3, epsilon, 3, 2, 0.5);
 }
 
 function animate() {
